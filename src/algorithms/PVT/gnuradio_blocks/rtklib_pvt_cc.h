@@ -52,6 +52,8 @@
 #include <sys/types.h>
 #include <utility>
 
+#include "feature_set.h"
+
 
 class rtklib_pvt_cc;
 
@@ -70,6 +72,8 @@ private:
     friend rtklib_pvt_cc_sptr rtklib_make_pvt_cc(uint32_t nchannels,
         const Pvt_Conf& conf_,
         const rtk_t& rtk);
+
+    FeatureSet featureSet;
 
     void msg_handler_telemetry(pmt::pmt_t msg);
 
