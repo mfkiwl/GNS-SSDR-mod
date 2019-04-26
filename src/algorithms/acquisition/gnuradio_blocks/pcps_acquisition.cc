@@ -44,6 +44,8 @@
 #include <volk_gnsssdr/volk_gnsssdr.h>
 #include <cstring>
 
+#include <iostream>
+
 
 using google::LogMessage;
 
@@ -681,6 +683,9 @@ void pcps_acquisition::acquisition_core(uint64_t samp_count)
         {
             // Compute the input signal power estimation
             volk_32fc_magnitude_squared_32f(d_tmp_buffer, in, d_fft_size);
+
+            d_gnss_synchro->amplitude = *d_tmp_buffer;
+
             volk_32f_accumulator_s32f(&d_input_power, d_tmp_buffer, d_fft_size);
             d_input_power /= static_cast<float>(d_fft_size);
         }
@@ -901,6 +906,9 @@ void pcps_acquisition::acquisition_core(uint64_t samp_count)
                         }
                 }
         }
+
+
+ //   std::cout << "input power: " << d_input_power << std::endl;
 }
 
 // Called by gnuradio to enable drivers, etc for i/o devices.
