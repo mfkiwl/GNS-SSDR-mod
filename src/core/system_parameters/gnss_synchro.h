@@ -56,6 +56,7 @@ public:
     uint64_t Acq_samplestamp_samples;  //!< Set by Acquisition processing block
     uint32_t Acq_doppler_step;         //!< Set by Acquisition processing block
     bool Flag_valid_acquisition;       //!< Set by Acquisition processing block
+    float amplitude;                   //!< Set by Acquisition processing block
 
     // Tracking
     int64_t fs;                        //!< Set by Tracking processing block
@@ -101,6 +102,7 @@ public:
         ar& BOOST_SERIALIZATION_NVP(Acq_samplestamp_samples);
         ar& BOOST_SERIALIZATION_NVP(Acq_doppler_step);
         ar& BOOST_SERIALIZATION_NVP(Flag_valid_acquisition);
+        ar& BOOST_SERIALIZATION_NVP(amplitude);
         // Tracking
         ar& BOOST_SERIALIZATION_NVP(fs);
         ar& BOOST_SERIALIZATION_NVP(Prompt_I);
