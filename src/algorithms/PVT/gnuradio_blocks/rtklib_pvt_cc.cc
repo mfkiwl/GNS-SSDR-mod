@@ -272,6 +272,7 @@ rtklib_pvt_cc::rtklib_pvt_cc(uint32_t nchannels,
                             gr::io_signature::make(nchannels, nchannels, sizeof(Gnss_Synchro)),
                             gr::io_signature::make(0, 0, 0))
 {
+
     d_output_rate_ms = conf_.output_rate_ms;
     d_display_rate_ms = conf_.display_rate_ms;
     d_dump = conf_.dump;
@@ -312,6 +313,8 @@ rtklib_pvt_cc::rtklib_pvt_cc(uint32_t nchannels,
         }
 
     d_nchannels = nchannels;
+
+    featureSet.nSats = nchannels;
 
     type_of_rx = conf_.type_of_receiver;
 
@@ -914,6 +917,7 @@ bool rtklib_pvt_cc::get_latest_PVT(double* longitude_deg,
     gr::thread::scoped_lock lock(d_setlock);
     if (d_pvt_solver->is_valid_position())
         {
+
             *latitude_deg = d_pvt_solver->get_latitude();
             *longitude_deg = d_pvt_solver->get_longitude();
             *height_m = d_pvt_solver->get_height();
@@ -2886,6 +2890,58 @@ int rtklib_pvt_cc::work(int noutput_items, gr_vector_const_void_star& input_item
                     // DEBUG MESSAGE: Display position in console output
                     if (d_pvt_solver->is_valid_position() and flag_display_pvt)
                         {
+
+                            // exteact features from gnss_observables_map
+
+                            featureSet.signalToNoise = 0;
+                            featureSet.signalToNoise = 0;
+                            int counter = 0;
+
+                            for (auto it = gnss_observables_map.begin(); it != gnss_observables_map.end(); ++it) {
+
+                                counter++;
+
+                                Gnss_Synchro syn = it->second;
+                                int32_t channel_id = syn.Channel_ID;
+                            
+                                featureSet.signalToNoise += syn.CN0_dB_hz;
+                                featureSet.pseudoranges[channel_id] = syn.Pseudorange_m;
+                                featureSet.carrierPhases[channel_id] = syn.Carrier_phase_rads;
+                                featureSet.dopplerMeasured += syn.Carrier_Doppler_hz;
+                                featureSet.amplitudes[channel_id] = syn.amplitude;
+                            }
+
+                            featureSet.signalToNoise /= counter;
+                            featureSet.dopplerMeasured /= counter;
+
+                            // extract features from PVT    TODO fix blocking bug, maybe using d_pvt_solver in stead of get_latest_pwt
+                           /*
+                            double longitude;      // deg
+                            double latitude;       // deg
+                            double height;         // m
+                            double groundSpeed;   // km/h
+                            double courseOverGround;
+                            time_t time;
+
+                            if (get_latest_PVT( &longitude,
+                                                &latitude,
+                                                &height,
+                                                &groundSpeed,
+                                                &courseOverGround,
+                                                &time)) {
+
+                                featureSet.velocity = groundSpeed;  // does this correspond to the required velocity feature?
+                            }
+                            */
+                            /* TODO compute missing features:
+                        
+                                - gapFromLastPosition
+                                - easting, northing, height from real pos
+                                - acceleration
+                            */
+
+                            featureSet.printFeatureSet();
+
                             std::streamsize ss = std::cout.precision();  // save current precision
                             std::cout.setf(std::ios::fixed, std::ios::floatfield);
                             auto facet = new boost::posix_time::time_facet("%Y-%b-%d %H:%M:%S.%f %z");
