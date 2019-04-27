@@ -15,7 +15,7 @@ public:
     std::map<int, double> pseudoranges;
     std::map<int, double> carrierPhases;
     double dopplerMeasured;
-    double gapFromLastPos;
+//    double gapFromLastPos;
 //  double eastingFromReal
 //  double northingFromReal
 //  double heightFromReal
