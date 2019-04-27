@@ -2893,7 +2893,7 @@ int rtklib_pvt_cc::work(int noutput_items, gr_vector_const_void_star& input_item
 
                             // exteact features from gnss_observables_map
                             featureSet.assembleFeatures(gnss_observables_map, d_pvt_solver);
-                            featureSet.printFeatureSet();
+                            featureSet.printFeatures();
 
                             std::streamsize ss = std::cout.precision();  // save current precision
                             std::cout.setf(std::ios::fixed, std::ios::floatfield);

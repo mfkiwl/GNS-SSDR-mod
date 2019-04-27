@@ -1,8 +1,6 @@
 #ifndef FEATURE_SET_H   
 #define FEATURE_SET_H
 
-#include <iostream>
-#include <string>
 #include <map>
 #include "gnss_synchro.h"
 #include "rtklib_solver.h"
@@ -27,7 +25,8 @@ public:
 //  ___ timewithNoLock
 
 
-    void assembleFeatures(std::map<int, Gnss_Synchro> &synchros, std::shared_ptr<rtklib_solver> pvt_solver) {
+    void assembleFeatures(std::map<int, Gnss_Synchro> &synchros, 
+                          std::shared_ptr<rtklib_solver> pvt_solver) {
 
         signalToNoise = 0;
         signalToNoise = 0;
@@ -37,14 +36,14 @@ public:
 
             counter++;
 
-                Gnss_Synchro syn = it->second;
-                int32_t channel_id = syn.Channel_ID;
-                            
-                signalToNoise += syn.CN0_dB_hz;
-                pseudoranges[channel_id] = syn.Pseudorange_m;
-                carrierPhases[channel_id] = syn.Carrier_phase_rads;
-                dopplerMeasured += syn.Carrier_Doppler_hz;
-                amplitudes[channel_id] = syn.amplitude;
+            Gnss_Synchro syn = it->second;
+            int32_t channel_id = syn.Channel_ID;
+                                
+            signalToNoise += syn.CN0_dB_hz;
+            pseudoranges[channel_id] = syn.Pseudorange_m;
+            carrierPhases[channel_id] = syn.Carrier_phase_rads;
+            dopplerMeasured += syn.Carrier_Doppler_hz;
+            amplitudes[channel_id] = syn.amplitude;
         }
 
         signalToNoise /= counter;
@@ -52,20 +51,7 @@ public:
         nSats = counter;
     }
 
-
-    void printMap(std::map<int, double> m, std::string name) {
-
-        std::cout   << "  " << name << ": {";
-
-        for (auto it = m.begin(); it != m.end(); ++it) {
-
-            std::cout << " " << it->first << ": " << it->second << ",";
-        }
-
-        std::cout << " }" << std::endl;
-    }
-
-    void printFeatureSet() {
+    void printFeatures() {
 
         std::cout   << "FEATURES:" << std::endl
                     << "  nSats: " << nSats << std::endl
@@ -83,6 +69,20 @@ public:
                     << "  acceleration: " << "NA" << std::endl;
 
         printMap(amplitudes, "amplitudes");
+    }
+
+private:
+
+    void printMap(std::map<int, double> m, std::string name) {
+
+        std::cout   << "  " << name << ": {";
+
+        for (auto it = m.begin(); it != m.end(); ++it) {
+
+            std::cout << " " << it->first << ": " << it->second << ",";
+        }
+
+        std::cout << " }" << std::endl;
     }
 };
 
