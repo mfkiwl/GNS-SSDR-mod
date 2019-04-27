@@ -1,6 +1,6 @@
-*GNSS receiver with spoofing detection* 
+***GNSS receiver with spoofing detection***
 
-The goal of this prject is to include a spoofing detection system into
+The goal of this project is to include a spoofing detection system into
 the GNSS-SDR receiver
 
 [![](./docs/doxygen/images/gnss-sdr_logo.png)](https://gnss-sdr.org "GNSS-SDR website")
