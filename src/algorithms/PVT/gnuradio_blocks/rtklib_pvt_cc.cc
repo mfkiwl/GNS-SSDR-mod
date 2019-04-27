@@ -2892,54 +2892,7 @@ int rtklib_pvt_cc::work(int noutput_items, gr_vector_const_void_star& input_item
                         {
 
                             // exteact features from gnss_observables_map
-
-                            featureSet.signalToNoise = 0;
-                            featureSet.signalToNoise = 0;
-                            int counter = 0;
-
-                            for (auto it = gnss_observables_map.begin(); it != gnss_observables_map.end(); ++it) {
-
-                                counter++;
-
-                                Gnss_Synchro syn = it->second;
-                                int32_t channel_id = syn.Channel_ID;
-                            
-                                featureSet.signalToNoise += syn.CN0_dB_hz;
-                                featureSet.pseudoranges[channel_id] = syn.Pseudorange_m;
-                                featureSet.carrierPhases[channel_id] = syn.Carrier_phase_rads;
-                                featureSet.dopplerMeasured += syn.Carrier_Doppler_hz;
-                                featureSet.amplitudes[channel_id] = syn.amplitude;
-                            }
-
-                            featureSet.signalToNoise /= counter;
-                            featureSet.dopplerMeasured /= counter;
-
-                            // extract features from PVT    TODO fix blocking bug, maybe using d_pvt_solver in stead of get_latest_pwt
-                           /*
-                            double longitude;      // deg
-                            double latitude;       // deg
-                            double height;         // m
-                            double groundSpeed;   // km/h
-                            double courseOverGround;
-                            time_t time;
-
-                            if (get_latest_PVT( &longitude,
-                                                &latitude,
-                                                &height,
-                                                &groundSpeed,
-                                                &courseOverGround,
-                                                &time)) {
-
-                                featureSet.velocity = groundSpeed;  // does this correspond to the required velocity feature?
-                            }
-                            */
-                            /* TODO compute missing features:
-                        
-                                - gapFromLastPosition
-                                - easting, northing, height from real pos
-                                - acceleration
-                            */
-
+                            featureSet.assembleFeatures(gnss_observables_map, d_pvt_solver);
                             featureSet.printFeatureSet();
 
                             std::streamsize ss = std::cout.precision();  // save current precision
