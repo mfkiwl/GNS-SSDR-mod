@@ -23,10 +23,12 @@ endif()
 
 set(PVT_GR_BLOCKS_SOURCES
     rtklib_pvt_cc.cc
+    feature_set.cc
 )
 
 set(PVT_GR_BLOCKS_HEADERS
     rtklib_pvt_cc.h
+    feature_set.h
 )
 
 include_directories(
@@ -47,3 +49,14 @@ include_directories(
 add_library(pvt_gr_blocks ${PVT_GR_BLOCKS_SOURCES} ${PVT_GR_BLOCKS_HEADERS})
 source_group(Headers FILES ${PVT_GR_BLOCKS_HEADERS})
 target_link_libraries(pvt_gr_blocks pvt_lib ${ARMADILLO_LIBRARIES})
+
+
+
+
+
+
+
+
+
+
+
