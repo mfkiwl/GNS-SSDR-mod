@@ -51,6 +51,8 @@
 #include <sys/msg.h>
 #include <sys/types.h>
 #include <utility>
+#include "classification.h"
+#include "dummy_classifier.h"
 
 #include "feature_set.h"
 
@@ -74,6 +76,7 @@ private:
         const rtk_t& rtk);
 
     FeatureSet featureSet;
+    DummyClassifier dummyClassifier;
 
     void msg_handler_telemetry(pmt::pmt_t msg);
 

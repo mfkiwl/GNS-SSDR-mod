@@ -2895,6 +2895,9 @@ int rtklib_pvt_cc::work(int noutput_items, gr_vector_const_void_star& input_item
                             featureSet.assembleFeatures(gnss_observables_map, d_pvt_solver);
                             featureSet.printFeatures();
 
+                            Classification cl = dummyClassifier.classify(featureSet);
+                            dummyClassifier.printClass(cl);
+
                             std::streamsize ss = std::cout.precision();  // save current precision
                             std::cout.setf(std::ios::fixed, std::ios::floatfield);
                             auto facet = new boost::posix_time::time_facet("%Y-%b-%d %H:%M:%S.%f %z");

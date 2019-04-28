@@ -24,11 +24,13 @@ endif()
 set(PVT_GR_BLOCKS_SOURCES
     rtklib_pvt_cc.cc
     feature_set.cc
+    dummy_classifier.cc
 )
 
 set(PVT_GR_BLOCKS_HEADERS
     rtklib_pvt_cc.h
     feature_set.h
+    dummy_classifier.h
 )
 
 include_directories(
