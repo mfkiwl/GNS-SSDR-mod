@@ -6,6 +6,8 @@
 #include "rtklib_solver.h"
 #include <map>
 #include <vector>
+#include <queue>
+#include <algorithm>
 #include <cmath>
 #include <iostream>
 
@@ -29,14 +31,14 @@ public:
     std::map<int, double> pseudoranges;
     std::map<int, double> carrierPhases;
     double dopplerMeasured;
-    double gapFromLastPos;
-//  double eastingFromReal
-//  double northingFromReal
-//  double heightFromReal
+    double gapFromLastPos;  
+    double eastingFromReal;  // real pos estimated from average over last 10 positions
+    double northingFromReal;
+    double heightFromReal;
     double velocity; // m/s
     double acceleration; // m/s^2
     std::map<int, double> amplitudes;
-//  ___ timewithNoLock
+    double timeWithNoLock;
 
     // methods
 
@@ -61,6 +63,15 @@ private:
     std::vector<int> lastPRNs;
     std::vector<int> currentPRNs;
 
+    std::deque<Position> lastPositions;
+    size_t queueSize = 10;
+    Position queueAvg;
+
+    bool noLock = true;
+    std::chrono::high_resolution_clock::time_point tLock_1;
+    std::chrono::high_resolution_clock::time_point tLock_2;
+    std::chrono::duration<double> dTlock;
+
     // methods
 
     double posDistance(Position p1, Position p2);
@@ -68,6 +79,12 @@ private:
     int comparePRNs();
 
     void printMap(std::map<int, double> m, std::string name);
+
+    void updatePosQueue(Position pos);
+
+    void distancesFromReal(Position pos);
+
+    void updateTimeWithNoLock();
 };
 
 
