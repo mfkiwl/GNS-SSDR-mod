@@ -23,6 +23,38 @@ class FeatureSet {
 
 public:
 
+    /*
+
+        TODO: compute the following features and make other fields private
+
+        For Generic attack detection with J48 16f and 6f
+
+        - min Doppler
+        - std DevDoppler
+        - min ValidSats
+        - min PseudoRanges
+        - min SigToNoise
+        - stdDev nValidSats
+        - stdDev sigToNoise
+        - stdDev pseudoranges
+        - max nsatschanged
+        - avg ValidSats
+        - avg pseudoranges
+        - avg Doppler
+        - max signalToNoise
+        - max carrierPhase
+        - avg sigToNoise
+
+        For T2 attack detection - covered by the above -
+
+        For T3 attack detection
+
+        - max ValidSats
+        - min height from real pos
+        - max amplitude of raw
+
+    */
+
     // data mebers
 
     int nSats;
