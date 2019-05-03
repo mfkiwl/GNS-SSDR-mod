@@ -4,6 +4,49 @@
 
 using namespace std::chrono;
 
+void FeatureSet::updateFeaturesPerChannel(  std::map<int, Gnss_Synchro> &synchros, 
+                                std::shared_ptr<rtklib_solver> pvt_solver) {
+
+
+    assembleFeatures(synchros, pvt_solver);
+
+    featuresPerChannel.clear();
+
+    for (auto it = currentPRNs.begin(); it != currentPRNs.end(); ++it) {
+
+        featuresPerChannel[*it] = featuresForChannel(*it);
+    }
+}
+
+std::map<std::string, double> FeatureSet::featuresForChannel(int channel_id) {
+
+    std::map<std::string, double> features; 
+
+    features["channel_id"] = channel_id;
+    features["minDoppler"] = 0;
+    features["stddevDoppler"] = 0;
+    features["minValidSats"] = 0;
+    features["minPseudoRange"] = 0;
+    features["minSigToNoise"] = 0;
+    features["stddevValidsats"] = 0;
+    features["stddevSigToNoise"] = 0;
+    features["stddevPseudoranges"] = 0;
+    features["maxSatsChanged"] = 0;
+    features["avgValidSats"] = 0;
+    features["avgPseudoRanges"] = 0;
+    features["avgDoppler"] = 0;
+    features["maxSigToNoise"] = 0;
+    features["maxCarrierPhase"] = 0;
+    features["maxValidSats"] = 0;
+    features["maxCarrierPhase"] = 0;
+    features["avgSigToNoise"] = 0;
+    features["minHeightFromReal"] = 0;
+    features["maxAmplitude"] = 0;
+
+    return features;
+}
+
+
 void FeatureSet::assembleFeatures(std::map<int, Gnss_Synchro> &synchros, 
                                   std::shared_ptr<rtklib_solver> pvt_solver) {
 
@@ -31,8 +74,8 @@ void FeatureSet::assembleFeatures(std::map<int, Gnss_Synchro> &synchros,
         }
                                 
         signalToNoise += syn.CN0_dB_hz;
-        pseudoranges[channel_id] = syn.Pseudorange_m;
-        carrierPhases[channel_id] = syn.Carrier_phase_rads;
+        pseudorangePerChannel[channel_id] = syn.Pseudorange_m;
+        carrierPhasePerChannel[channel_id] = syn.Carrier_phase_rads;
         dopplerMeasured += syn.Carrier_Doppler_hz;
         amplitudes[channel_id] = syn.amplitude;
     }
@@ -68,21 +111,21 @@ void FeatureSet::assembleFeatures(std::map<int, Gnss_Synchro> &synchros,
 
 void FeatureSet::printFeatures() {
 
-    std::cout   << "FEATURES:" << std::endl
-                << "  nSats: " << nSats << std::endl
-                << "  satsChanged: " << nSatsChanged << std::endl
-                 << "  signalToNoise: " << signalToNoise << std::endl;
+    std::cout   << "FEATURES:" << std::endl;
 
-    printMap(pseudoranges, "pseudoranges");
-    printMap(carrierPhases,"carrier phases");
+    for (auto it = featuresPerChannel.begin(); it != featuresPerChannel.end(); ++it) {
 
-    std::cout   << "  dopplerMeasured: " << dopplerMeasured << std::endl
-                << "  gapFromLastPos: " << gapFromLastPos << std::endl
-                << "  eastingFromReal: " << eastingFromReal << std::endl
-                << "  northingFromReal: " << northingFromReal << std::endl
-                << "  heightFromReal: " << heightFromReal << std::endl
-                << "  velocity: " << velocity << " m/s" << std::endl
-                << "  acceleration: " << acceleration << " m/s^2" << std::endl;
+        int ch_id = it->first;
+        std::map <std::string, double> chData = it->second;
+
+        std::cout << "  Ch " << ch_id << std::endl;
+
+        for (auto it1 = chData.begin(); it1 != chData.end(); ++it1) {
+
+            std::cout << "    " << it1->first << ": " << it1->second << std::endl;
+        }
+    }
+
 
     printMap(amplitudes, "amplitudes");
 

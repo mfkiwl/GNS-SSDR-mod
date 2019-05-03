@@ -23,61 +23,17 @@ class FeatureSet {
 
 public:
 
-    /*
+    // data members
 
-        TODO: compute the following features and make other fields private
-
-        For Generic attack detection with J48 16f and 6f
-
-        - min Doppler
-        - std DevDoppler
-        - min ValidSats
-        - min PseudoRanges
-        - min SigToNoise
-        - stdDev nValidSats
-        - stdDev sigToNoise
-        - stdDev pseudoranges
-        - max nsatschanged
-        - avg ValidSats
-        - avg pseudoranges
-        - avg Doppler
-        - max signalToNoise
-        - max carrierPhase
-        - avg sigToNoise
-
-        For T2 attack detection - covered by the above -
-
-        For T3 attack detection
-
-        - max ValidSats
-        - min height from real pos
-        - max amplitude of raw
-
-    */
-
-    // data mebers
-
-    int nSats;
-    int nSatsChanged;
-    double signalToNoise;
-    std::map<int, double> pseudoranges;
-    std::map<int, double> carrierPhases;
-    double dopplerMeasured;
-    double gapFromLastPos;  
-    double eastingFromReal;  // real pos estimated from average over last 10 positions
-    double northingFromReal;
-    double heightFromReal;
-    double velocity; // m/s
-    double acceleration; // m/s^2
-    std::map<int, double> amplitudes;
-    double timeWithNoLock;
+    // In an other class specific classifiers may be instantiated for each channel,
+    std::map< int, std::map <std::string, double> > featuresPerChannel;
 
     // methods
 
-    void assembleFeatures(std::map<int, Gnss_Synchro> &synchros, 
-                          std::shared_ptr<rtklib_solver> pvt_solver);
+    void updateFeaturesPerChannel(  std::map<int, Gnss_Synchro> &synchros, 
+                                    std::shared_ptr<rtklib_solver> pvt_solver);
 
-    void printFeatures();
+    void printFeatures(); // temporary, to be removed
 
 private:
 
@@ -104,7 +60,25 @@ private:
     std::chrono::high_resolution_clock::time_point tLock_2;
     std::chrono::duration<double> dTlock;
 
+    int nSats;
+    int nSatsChanged;
+    double signalToNoise;
+    std::map<int, double> pseudorangePerChannel;
+    std::map<int, double> carrierPhasePerChannel;
+    double dopplerMeasured;
+    double gapFromLastPos;  
+    double eastingFromReal;  // real pos estimated from average over last 10 positions
+    double northingFromReal;
+    double heightFromReal;
+    double velocity; // m/s
+    double acceleration; // m/s^2
+    std::map<int, double> amplitudes;
+    double timeWithNoLock;
+
     // methods
+
+    void assembleFeatures(std::map<int, Gnss_Synchro> &synchros, 
+                          std::shared_ptr<rtklib_solver> pvt_solver);
 
     double posDistance(Position p1, Position p2);
 
@@ -117,6 +91,8 @@ private:
     void distancesFromReal(Position pos);
 
     void updateTimeWithNoLock();
+
+    std::map<std::string, double> featuresForChannel(int channel);
 };
 
 

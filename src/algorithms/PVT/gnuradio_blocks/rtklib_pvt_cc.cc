@@ -314,8 +314,6 @@ rtklib_pvt_cc::rtklib_pvt_cc(uint32_t nchannels,
 
     d_nchannels = nchannels;
 
-    featureSet.nSats = nchannels;
-
     type_of_rx = conf_.type_of_receiver;
 
     // GPS Ephemeris data message port in
@@ -2892,7 +2890,7 @@ int rtklib_pvt_cc::work(int noutput_items, gr_vector_const_void_star& input_item
                         {
 
                             // exteact features from gnss_observables_map
-                            featureSet.assembleFeatures(gnss_observables_map, d_pvt_solver);
+                            featureSet.updateFeaturesPerChannel(gnss_observables_map, d_pvt_solver);
                             featureSet.printFeatures();
 
                             Classification cl = dummyClassifier.classify(featureSet);
