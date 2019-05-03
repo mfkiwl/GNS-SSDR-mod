@@ -1,6 +1,7 @@
 
 #include "feature_set.h"
 #include <chrono>
+#include <cmath>
 
 using namespace std::chrono;
 
@@ -10,12 +11,87 @@ void FeatureSet::updateFeaturesPerChannel(  std::map<int, Gnss_Synchro> &synchro
 
     assembleFeatures(synchros, pvt_solver);
 
-    featuresPerChannel.clear();
+    mainCounter++;
+
+    if (mainCounter == 1) {
+
+        for (auto it = currentPRNs.begin(); it != currentPRNs.end(); ++it) {
+            minPseudoranges[*it] = DBL_MAX;
+            maxCarrierPhases[*it] = - DBL_MAX;
+            maxAmplitudes[*it] = - DBL_MAX;
+        }
+    }
+
+    if (dopplerMeasured < minDoppler) {
+        minDoppler = dopplerMeasured;
+    }
+
+    avgDopplerCurrent += (dopplerMeasured - avgDopplerPrev) / mainCounter;
+    varDoppler += (dopplerMeasured - avgDopplerPrev) * (dopplerMeasured - avgDopplerCurrent);
+
+    avgValidSatsCurrent += (nSats - avgValidSatsPrev) / mainCounter;
+    varValidSats += (nSats - avgValidSatsPrev) * (nSats - avgValidSatsCurrent);
+
+    avgSignalToNoiseCurrent += (signalToNoise - avgSignalToNoisePrev) / mainCounter;
+    varSignalToNoise += (signalToNoise - avgSignalToNoisePrev) * (signalToNoise - avgSignalToNoiseCurrent);
 
     for (auto it = currentPRNs.begin(); it != currentPRNs.end(); ++it) {
 
+        double prevPsr = minPseudoranges[*it];
+        double currentPsr = pseudorangePerChannel[*it];
+        
+        if (currentPsr < prevPsr) {
+            minPseudoranges[*it] = currentPsr;
+        }     
+
+        avgPseudorangesCurrent[*it] += (pseudorangePerChannel[*it] - avgPseudorangesPrev[*it]) / mainCounter;
+        varPseudoranges[*it] += (pseudorangePerChannel[*it] - avgPseudorangesPrev[*it]) * (pseudorangePerChannel[*it] - avgPseudorangesCurrent[*it]); 
+
+        if (carrierPhasePerChannel[*it] > maxCarrierPhases[*it]) {
+            maxCarrierPhases[*it] = carrierPhasePerChannel[*it];
+        }   
+
+        if (amplitudes[*it] > maxAmplitudes[*it]) {
+            maxAmplitudes[*it] = amplitudes[*it];
+        }   
+
+        avgPseudorangesPrev[*it] = avgPseudorangesCurrent[*it];
+    }
+
+    if (nSats < minValidSats) {
+        minValidSats = nSats;
+    }    
+
+    if (nSats > maxValidSats) {
+        maxValidSats = nSats;
+    } 
+
+    if (signalToNoise < minSignalToNoise) {
+        minSignalToNoise = signalToNoise;
+    }
+
+    if (nSatsChanged > maxSatsChanged) {
+        maxSatsChanged = nSatsChanged;
+    }
+
+    if (signalToNoise > maxSignalToNoise) {
+        maxSignalToNoise = signalToNoise;
+    }
+
+    if (heightFromReal < minHeightFromReal) {
+        minHeightFromReal = heightFromReal;
+    }
+
+    avgDopplerPrev = avgDopplerCurrent;
+    avgValidSatsPrev = avgValidSatsCurrent;
+    avgSignalToNoisePrev = avgSignalToNoiseCurrent;
+
+    featuresPerChannel.clear();
+
+    for (auto it = currentPRNs.begin(); it != currentPRNs.end(); ++it) {
         featuresPerChannel[*it] = featuresForChannel(*it);
     }
+
 }
 
 std::map<std::string, double> FeatureSet::featuresForChannel(int channel_id) {
@@ -23,25 +99,24 @@ std::map<std::string, double> FeatureSet::featuresForChannel(int channel_id) {
     std::map<std::string, double> features; 
 
     features["channel_id"] = channel_id;
-    features["minDoppler"] = 0;
-    features["stddevDoppler"] = 0;
-    features["minValidSats"] = 0;
-    features["minPseudoRange"] = 0;
-    features["minSigToNoise"] = 0;
-    features["stddevValidsats"] = 0;
-    features["stddevSigToNoise"] = 0;
-    features["stddevPseudoranges"] = 0;
-    features["maxSatsChanged"] = 0;
-    features["avgValidSats"] = 0;
-    features["avgPseudoRanges"] = 0;
-    features["avgDoppler"] = 0;
-    features["maxSigToNoise"] = 0;
-    features["maxCarrierPhase"] = 0;
-    features["maxValidSats"] = 0;
-    features["maxCarrierPhase"] = 0;
-    features["avgSigToNoise"] = 0;
-    features["minHeightFromReal"] = 0;
-    features["maxAmplitude"] = 0;
+    features["minDoppler"] = minDoppler;
+    features["stddevDoppler"] = sqrt(varDoppler);
+    features["minValidSats"] = minValidSats;
+    features["minPseudoRange"] = minPseudoranges[channel_id];
+    features["minSigToNoise"] = minSignalToNoise;
+    features["stddevValidsats"] = sqrt(varValidSats);
+    features["stddevSigToNoise"] = sqrt(varSignalToNoise);
+    features["stddevPseudorange"] = sqrt(varPseudoranges[channel_id]);
+    features["maxSatsChanged"] = maxSatsChanged;
+    features["avgValidSats"] = avgValidSatsCurrent;
+    features["avgPseudoRange"] = avgPseudorangesCurrent[channel_id];
+    features["avgDoppler"] = avgDopplerCurrent;
+    features["maxSigToNoise"] = maxSignalToNoise;
+    features["maxCarrierPhase"] = maxCarrierPhases[channel_id];
+    features["maxValidSats"] = maxValidSats;
+    features["avgSigToNoise"] = avgSignalToNoiseCurrent;
+    features["minHeightFromReal"] = minHeightFromReal;
+    features["maxAmplitude"] = maxAmplitudes[channel_id];
 
     return features;
 }
@@ -125,11 +200,6 @@ void FeatureSet::printFeatures() {
             std::cout << "    " << it1->first << ": " << it1->second << std::endl;
         }
     }
-
-
-    printMap(amplitudes, "amplitudes");
-
-    std::cout << "  timeWithNoLock: " << timeWithNoLock << std::endl;
 }
 
 

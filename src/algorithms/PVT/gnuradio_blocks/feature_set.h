@@ -9,6 +9,7 @@
 #include <queue>
 #include <algorithm>
 #include <cmath>
+#include <float.h>
 #include <iostream>
 
 
@@ -37,7 +38,43 @@ public:
 
 private:
 
-    // data members
+    long mainCounter = 0;
+
+    // minima, maxima, averages and standard deviations
+    // all data as double, for processing by classifiers
+
+    double minDoppler = DBL_MAX;
+    double avgDopplerCurrent = 0;
+    double avgDopplerPrev = 0;
+    double varDoppler = 0;
+
+    std::map<int, double> minPseudoranges;
+    std::map<int, double> avgPseudorangesPrev;
+    std::map<int, double> avgPseudorangesCurrent;
+    std::map<int, double> varPseudoranges;
+
+    double minSignalToNoise = DBL_MAX;
+    double maxSignalToNoise = - DBL_MAX;
+    double avgSignalToNoisePrev = 0;
+    double avgSignalToNoiseCurrent = 0;
+    double varSignalToNoise = 0;
+    
+    double minValidSats = DBL_MAX;
+    double maxValidSats = - DBL_MAX;
+    double avgValidSatsPrev = 0;
+    double avgValidSatsCurrent = 0;
+    double varValidSats = 0;
+
+    double maxSatsChanged = - DBL_MAX;
+
+    std::map<int, double> maxCarrierPhases;
+
+    double minHeightFromReal = DBL_MAX;
+
+    std::map<int, double> maxAmplitudes;
+
+
+    // instantaneous data
 
     int lastTime; // times are in ms
     int currentTime;
