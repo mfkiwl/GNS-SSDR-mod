@@ -2,55 +2,36 @@
 #define C_45_TREE_H
 
 #include <vector>
-#include <map>
 #include <iostream>
 
 enum NodeType {
     ROOT, INNER, LEAF
 };
 
-enum Classification {
-    SETOSA, VERSICOLOR, VIRGINICA
-};
-
 class C45_tree {
 
 public:
 
-    C45_tree() {
-        type = ROOT;
-    }
+    C45_tree() { type = ROOT; }
 
-    void printType() {
-        
-        switch(type) {
+private:
 
-            case ROOT:
-                std::cout << "ROOT";
-                break;
+    friend class C45_treeBuilder;
 
-            case INNER:
-                std::cout << "INNER";
-                break;
-
-            case LEAF:
-                std::cout << "LEAF";
-                break;
-        }
-
-        std::cout << std::endl;
-    }
-
-    NodeType type;
+    int nClasses;
     int nFeatures;
+    NodeType type;
     int splitFeature; // index
     double splitValue;
-    C45_tree * parent;
-    C45_tree * left;
-    C45_tree * right;
-    std::map<int, double> data;  
-    std::map<int, double> dataLeft; 
-    std::map<int, double> dataRight;  
+    C45_tree * parent = nullptr;
+    C45_tree * left = nullptr;
+    C45_tree * right = nullptr;
+    std::vector<double> data;  
+    std::vector<double> dataLeft; 
+    std::vector<double> dataRight;  
+    int majority;
+    bool isRoot() { return type == ROOT; }
+    bool isLeaf() { return type == LEAF; }
 };
 
 #endif
