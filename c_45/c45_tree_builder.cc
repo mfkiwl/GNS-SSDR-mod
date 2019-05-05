@@ -7,14 +7,19 @@
 #include <vector>
 #include <math.h>
 #include <utility> 
+#include <algorithm>
+#include <float.h>
 
-C45_tree C45_treeBuilder::buildTree(std::string fName, int nClasses, int maxDepth, int minSize) {
+#include <iostream>
 
-    maxDpt = maxDepth;
+C45_tree C45_treeBuilder::buildTree(std::string fName, int nClasses, int minSize) {
+
     minSz = minSize;
     tree.nClasses = nClasses;
 
     readCsv(fName);
+
+    doSplits(tree);
 
     return tree;
 }
@@ -84,21 +89,83 @@ void C45_treeBuilder::sampleToData(std::vector<std::string> sample) {
     }
 }
 
-void C45_treeBuilder::setSplit(std::map<long, std::vector<double>> data) {
+void C45_treeBuilder::doSplits(C45_tree node) {
+
+    // Base cases
+    if (node.data.size() <= minSz || allSame(node)) {
+
+        node.type = LEAF;
+        node.classification = majority(node);
+        return;
+    }
+
+    // Recursive case
    
-    int bestGain; 
+    double bestGain = - DBL_MAX; 
     int bestFeature = -1;
     double bestThreshold;
+    std::map<long, std::vector<double>> bestLeft;
+    std::map<long, std::vector<double>> bestRight;
 
-    std::map<long, std::vector<double>> left;
-    std::map<long, std::vector<double>> right;
+    for (int feat = 0; feat < tree.nFeatures; ++feat) {
 
-    for (int i = 0; i < tree.nFeatures; ++i) {
+        std::vector<std::pair<double, long>> sorted = makeSortedVector(node.data, feat);
 
-        std::vector<std::map<long, std::vector<double>>> sorted = makeSortedVector(data, i);
+        for (auto it = sorted.begin(); it != sorted.end(); ++it) {
 
-        // TODO implement splits and evaluate gains
+            std::pair < std::map<long, std::vector<double>>, 
+                        std::map<long, std::vector<double>>> subsets = splitData (  
+                                                            node.data, 
+                                                            feat, 
+                                                            it->first);
+
+            std::map<long, std::vector<double>> dataLeft = subsets.first;
+            std::map<long, std::vector<double>> dataRight = subsets.second;
+
+            double gain = getGain(node.data, dataLeft, dataRight);
+
+            if (gain > bestGain) {
+
+                bestGain = gain;
+                bestFeature = feat;
+                
+                if (it == sorted.begin()) {
+                    bestThreshold = it->first / 2;
+                }
+                else {
+                    bestThreshold = ((it -1)->first + it->first) / 2;
+                }
+
+                bestLeft = dataLeft;
+                bestRight = dataRight;
+            }
+        }
     }
+
+    node.type = INNER;
+    node.splitFeature = bestFeature;
+    node.splitValue = bestThreshold;
+
+    C45_tree leftChild;
+    C45_tree rightChild;
+
+    leftChild.nClasses = node.nClasses;
+    leftChild.nFeatures = node.nFeatures;
+    leftChild.parent = &node;
+    leftChild.data = bestLeft;
+
+    rightChild.nClasses = node.nClasses;
+    rightChild.nFeatures = node.nFeatures;
+    rightChild.parent = &node;
+    rightChild.data = bestRight;
+
+    node.left = &leftChild;
+    node.right = &rightChild;
+    
+    node.data.clear();
+
+    doSplits(leftChild);
+    doSplits(rightChild);
 }
 
 double C45_treeBuilder::getEntropy(std::map<long, std::vector<double>> data) {
@@ -111,9 +178,13 @@ double C45_treeBuilder::getEntropy(std::map<long, std::vector<double>> data) {
 
     double classSums[tree.nClasses];
 
-    for (auto it = data.begin(); it != data.end()) {
+    for (int i = 0; i < tree.nClasses; ++i) {
+        classSums[i] = 0;
+    }
 
-        int cl = labels[*it];
+    for (auto it = data.begin(); it != data.end(); ++it) {
+
+        int cl = labels[it->first];
 
         for (int i = 0; i < tree.nClasses; ++i) {
             ++classSums[cl];
@@ -122,8 +193,8 @@ double C45_treeBuilder::getEntropy(std::map<long, std::vector<double>> data) {
 
     double entropy = 0;
     
-    for (int i = 0; i < tree.nClasses) {
-        double csum == classSums[i];
+    for (int i = 0; i < tree.nClasses; ++i) {
+        double csum = classSums[i];
         csum /= sampleCount;
         entropy += csum * log2(csum);
     }
@@ -142,23 +213,18 @@ double C45_treeBuilder::getGain(std::map<long, std::vector<double>> top,
     return eTop - eLeft - eRight;
 }
 
-void C45_treeBuilder::addNode() {
-
-}
-
-std::vector<std::map<long, std::vector<double>>> C45_treeBuilder::makeSortedVector(
+std::vector<std::pair<double, long>> C45_treeBuilder::makeSortedVector(
                                                     std::map<long, std::vector<double>> data, 
                                                     int feature) {
 
-    std::vector<pair> vec;
+    std::vector<std::pair<double, long>> vec;
 
     for (auto it = data.begin(); it != data.end(); ++it) {
 
-        std::map<long, std::vector<double> item = it->second;
-        double value = item.second[feature]
+        double value = it->second[feature];
+        long idx = it->first;
 
-        std::pair<double, std::map<long, std::vector<double>> p;
-        p = std::make_pair(value, item);
+        std::pair<double, int> p = std::make_pair(value, idx);
 
         vec.push_back(p);
     }
@@ -168,7 +234,84 @@ std::vector<std::map<long, std::vector<double>>> C45_treeBuilder::makeSortedVect
     return vec;
 }
 
+std::pair < std::map<long, std::vector<double>>, 
+                std::map<long, std::vector<double>>> C45_treeBuilder::splitData (  
+                                                    std::map<long, std::vector<double>> data, 
+                                                    int feature, 
+                                                    double threshold) {
 
+    std::pair < std::map<long, std::vector<double>>, 
+                std::map<long, std::vector<double>>> subsets;
+
+    for (auto it = data.begin(); it != data.end(); ++it) {
+
+        long idx = it->first;
+        double val = it->second[feature];
+
+        if (val < threshold) {
+
+            subsets.first[idx] = it->second;
+        }
+        else {
+            subsets.second[idx] = it->second; 
+        }
+    }
+
+    return subsets;
+}
+
+int C45_treeBuilder::majority(C45_tree node) {
+
+    std::map<long, std::vector<double>> data = node.data;
+
+    int classSums[node.nClasses];
+
+    for (int i = 0; i < node.nClasses; ++i) {
+        classSums[i] = 0;
+    }
+
+    for (auto it = data.begin(); it != data.end(); ++it) {
+        ++classSums[labels[it->first]];
+    }
+
+    long maxSum = 0;
+    int maxIdx = -1;
+
+    for (int i = 0; i < node.nClasses; ++i) {
+        
+        if (classSums[i] >= maxSum) {
+
+            maxSum = classSums[i];
+            maxIdx = i;
+        }
+    }  
+
+    return maxIdx;  
+}
+
+bool C45_treeBuilder::allSame(C45_tree node) {
+
+    std::map<long, std::vector<double>> data = node.data;
+
+    int currentClass = -1;
+
+    for (auto it = data.begin(); it != data.end(); ++it) {
+
+        int newClass = labels[it->first];
+
+        if (it == data.begin()) {
+            currentClass = newClass;
+        }
+        else {
+
+            if (newClass != currentClass) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
 
 
 

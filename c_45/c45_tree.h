@@ -2,6 +2,7 @@
 #define C_45_TREE_H
 
 #include <vector>
+#include <map>
 #include <iostream>
 
 enum NodeType {
@@ -26,10 +27,9 @@ private:
     C45_tree * parent = nullptr;
     C45_tree * left = nullptr;
     C45_tree * right = nullptr;
-    std::vector<double> data;  
-    std::vector<double> dataLeft; 
-    std::vector<double> dataRight;  
-    int majority;
+    std::map<long, std::vector<double>> data;  
+  
+    int classification = -1;
     bool isRoot() { return type == ROOT; }
     bool isLeaf() { return type == LEAF; }
 };
