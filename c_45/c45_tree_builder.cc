@@ -9,19 +9,30 @@
 #include <utility> 
 #include <algorithm>
 #include <float.h>
-
 #include <iostream>
 
-MinTree C45_treeBuilder::buildTree(std::string fName, int nClasses, int minSize) {
+long global_id = 0;
+
+void C45_treeBuilder::buildTree(std::string csvName, 
+                                std::string outName, 
+                                int nClasses, 
+                                int minSize) {
 
     minSz = minSize;
     tree.nClasses = nClasses;
 
-    readCsv(fName);
+    readCsv(csvName);
 
-    doSplits(tree);
+    std::ofstream out(outName);
 
-    return tree.minTree;
+    if (! out.is_open()) {
+        std::cout << "Error opening out file" << std::endl;
+        return;
+    }
+
+    doSplits(tree, out);
+
+    out.close();
 }
 
 void C45_treeBuilder::readCsv(std::string fName) {
@@ -89,16 +100,14 @@ void C45_treeBuilder::sampleToData(std::vector<std::string> sample) {
     }
 }
 
-void C45_treeBuilder::doSplits(C45_tree node) {
+void C45_treeBuilder::doSplits(C45_tree node, std::ofstream& out) {
 
     // Base cases
     if (node.data.size() <= minSz || allSame(node)) {
 
         node.type = LEAF;
+        node.data.clear();
         node.classification = majority(node);
-
-        node.minTree.type = LEAF;
-        node.minTree.classification = node.classification;
 
         return;
     }
@@ -155,31 +164,21 @@ void C45_treeBuilder::doSplits(C45_tree node) {
 
     leftChild.nClasses = node.nClasses;
     leftChild.nFeatures = node.nFeatures;
-    leftChild.parent = &node;
     leftChild.data = bestLeft;
+    leftChild.id = ++global_id;
 
     rightChild.nClasses = node.nClasses;
     rightChild.nFeatures = node.nFeatures;
-    rightChild.parent = &node;
     rightChild.data = bestRight;
+    rightChild.id = ++global_id;
 
     node.left = &leftChild;
     node.right = &rightChild;
     
     node.data.clear();
 
-    node.minTree.type = INNER;
-    node.minTree.splitFeature = bestFeature;
-    node.minTree.splitValue = bestThreshold;
-
-    MinTree minLeftChild;
-    MinTree minRightChild;
-
-    node.minTree.left = &minLeftChild;
-    node.minTree.right = &minRightChild;
-
-    doSplits(leftChild);
-    doSplits(rightChild);
+    doSplits(leftChild, out);
+    doSplits(rightChild, out);
 }
 
 double C45_treeBuilder::getEntropy(std::map<long, std::vector<double>> data) {
@@ -328,26 +327,7 @@ bool C45_treeBuilder::allSame(C45_tree node) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////////
 
-int MinTree::predict(std::vector<double> sample) {
-
-    return traverse(this, sample);
-}
-
-int MinTree::traverse(MinTree * node, std::vector<double> sample) {
-
-    if (node->type == LEAF) {
-        return node->classification;
-    }
-    
-    if (sample[node->splitFeature] < node->splitValue) {
-        return traverse(node->left, sample);
-    }
-    else {
-        return traverse(node->right, sample);
-    }
-}
 
 
 

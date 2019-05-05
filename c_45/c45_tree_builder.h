@@ -10,7 +10,7 @@ class C45_treeBuilder {
 
 public:
  
-    MinTree buildTree(std::string fileName, int nClasses, int minSize);
+    void buildTree(std::string fileName, std::string outName, int nClasses, int minSize);
 
 private:
 
@@ -24,7 +24,7 @@ private:
 
     void sampleToData(std::vector<std::string> sample);
 
-    void doSplits(C45_tree node);
+    void doSplits(C45_tree node, std::ofstream& out);
 
     double getEntropy(std::map<long, std::vector<double>>  data);
 
