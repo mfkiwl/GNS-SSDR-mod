@@ -4,6 +4,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <cstring>
 #include <vector>
 #include <math.h>
 #include <utility> 
@@ -26,13 +27,17 @@ void C45_treeBuilder::buildTree(std::string csvName,
     std::ofstream out(outName);
 
     if (! out.is_open()) {
-        std::cout << "Error opening out file" << std::endl;
+        std::cout << "Error opening output file" << std::endl;
         return;
     }
+
+    std::cout << outName << " opened" << std::endl;
 
     doSplits(tree, out);
 
     out.close();
+
+    std::cout << outName << " closed" << std::endl;
 }
 
 void C45_treeBuilder::readCsv(std::string fName) {
@@ -46,7 +51,7 @@ void C45_treeBuilder::readCsv(std::string fName) {
     }
 
     else {
-        std::cout << "File opened successfully" << std::endl;
+        std::cout << fName << " opened" << std::endl;
     }
 
     std::string line;
@@ -74,6 +79,8 @@ void C45_treeBuilder::readCsv(std::string fName) {
     }
 
     csv.close();
+
+    std::cout << fName << " closed" << std::endl;
 }
 
 void C45_treeBuilder::sampleToData(std::vector<std::string> sample) {
@@ -87,7 +94,7 @@ void C45_treeBuilder::sampleToData(std::vector<std::string> sample) {
         ++i;
     }
 
-    data[i] = currentFeatures;
+    tree.data[sampleCount] = currentFeatures;
 
     if (sample[i] == "Iris-setosa") {
         labels.push_back(0);
@@ -102,19 +109,26 @@ void C45_treeBuilder::sampleToData(std::vector<std::string> sample) {
 
 void C45_treeBuilder::doSplits(C45_tree node, std::ofstream& out) {
 
+    
+
     // Base cases
     if (node.data.size() <= minSz || allSame(node)) {
 
+        std::cout << "data size: " << node.data.size() << std::endl;
+
         node.type = LEAF;
-        node.data.clear();
         node.classification = majority(node);
+
+        out << node.toString() << std::endl;
 
         return;
     }
 
     // Recursive case
+
+    node.type = INNER;
    
-    double bestGain = - DBL_MAX; 
+    double bestGain = DBL_MAX; 
     int bestFeature = -1;
     double bestThreshold;
     std::map<long, std::vector<double>> bestLeft;
@@ -137,7 +151,7 @@ void C45_treeBuilder::doSplits(C45_tree node, std::ofstream& out) {
 
             double gain = getGain(node.data, dataLeft, dataRight);
 
-            if (gain > bestGain) {
+            if (gain >= bestGain) {
 
                 bestGain = gain;
                 bestFeature = feat;
@@ -155,7 +169,6 @@ void C45_treeBuilder::doSplits(C45_tree node, std::ofstream& out) {
         }
     }
 
-    node.type = INNER;
     node.splitFeature = bestFeature;
     node.splitValue = bestThreshold;
 
@@ -174,8 +187,19 @@ void C45_treeBuilder::doSplits(C45_tree node, std::ofstream& out) {
 
     node.left = &leftChild;
     node.right = &rightChild;
-    
-    node.data.clear();
+
+    out << node.toString() << std::endl;
+
+    if (bestLeft.size() == 0 || bestRight.size() == 0) {
+        leftChild.type = LEAF;
+        rightChild.type = LEAF;
+
+        out << node.toString() << std::endl;
+        out << leftChild.toString() << std::endl;
+        out << rightChild.toString() << std::endl;
+
+        return;
+    }
 
     doSplits(leftChild, out);
     doSplits(rightChild, out);
