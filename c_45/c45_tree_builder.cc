@@ -12,7 +12,7 @@
 
 #include <iostream>
 
-C45_tree C45_treeBuilder::buildTree(std::string fName, int nClasses, int minSize) {
+MinTree C45_treeBuilder::buildTree(std::string fName, int nClasses, int minSize) {
 
     minSz = minSize;
     tree.nClasses = nClasses;
@@ -21,7 +21,7 @@ C45_tree C45_treeBuilder::buildTree(std::string fName, int nClasses, int minSize
 
     doSplits(tree);
 
-    return tree;
+    return tree.minTree;
 }
 
 void C45_treeBuilder::readCsv(std::string fName) {
@@ -96,6 +96,10 @@ void C45_treeBuilder::doSplits(C45_tree node) {
 
         node.type = LEAF;
         node.classification = majority(node);
+
+        node.minTree.type = LEAF;
+        node.minTree.classification = node.classification;
+
         return;
     }
 
@@ -163,6 +167,16 @@ void C45_treeBuilder::doSplits(C45_tree node) {
     node.right = &rightChild;
     
     node.data.clear();
+
+    node.minTree.type = INNER;
+    node.minTree.splitFeature = bestFeature;
+    node.minTree.splitValue = bestThreshold;
+
+    MinTree minLeftChild;
+    MinTree minRightChild;
+
+    node.minTree.left = &minLeftChild;
+    node.minTree.right = &minRightChild;
 
     doSplits(leftChild);
     doSplits(rightChild);
@@ -314,8 +328,26 @@ bool C45_treeBuilder::allSame(C45_tree node) {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////////
 
+int MinTree::predict(std::vector<double> sample) {
 
+    return traverse(this, sample);
+}
+
+int MinTree::traverse(MinTree * node, std::vector<double> sample) {
+
+    if (node->type == LEAF) {
+        return node->classification;
+    }
+    
+    if (sample[node->splitFeature] < node->splitValue) {
+        return traverse(node->left, sample);
+    }
+    else {
+        return traverse(node->right, sample);
+    }
+}
 
 
 

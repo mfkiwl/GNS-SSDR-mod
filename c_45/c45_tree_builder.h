@@ -10,7 +10,7 @@ class C45_treeBuilder {
 
 public:
  
-    C45_tree buildTree(std::string fileName, int nClasses, int minSize);
+    MinTree buildTree(std::string fileName, int nClasses, int minSize);
 
 private:
 
