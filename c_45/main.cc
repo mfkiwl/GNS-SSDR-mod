@@ -1,13 +1,15 @@
 
 #include "c45_tree.h"
-#include "c45_tree_builder.h"
+#include <iostream>
 
 
 int main(int argc, char * argv[]) {
 
-    C45_treeBuilder treeBuilder;
+    C45_tree t1(3, 4, 5, "iris/normalizedIris.data");
 
-    treeBuilder.buildTree("iris/iris.data", "out.tree", 3, 5);
+    t1.printInfo();
+    
+    t1.buildTree("test.tree");
 
-    std::cout << "done" << std::endl;
+    std::cout << std::endl << "done" << std::endl << std::endl;
 }
