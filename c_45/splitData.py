@@ -3,7 +3,7 @@
 from sys import argv
 import random
 
-if len(argv) != 4 :
+if len(argv) != 5 and len(argv) != 3 :
     print("wrong args")
 
 else:
@@ -13,13 +13,20 @@ else:
     fileObj.close()
     random.shuffle(lines)
 
-    validSize = int(float(argv[2]) * len(lines))
-    testSize = int(float(argv[3]) * len(lines))
+    outDir = argv[2]
+
+    validSize = int(0.15 * len(lines))
+    testSize = int(0.15 * len(lines))
+
+    if len(argv) == 5:
+        validSize = int(float(argv[3]) * len(lines))
+        testSize = int(float(argv[4]) * len(lines))
+
     trainSize = len(lines) - validSize - testSize;
 
     # create validation set
 
-    validFile = open(argv[1] + "_valid.txt", 'w')
+    validFile = open(outDir + argv[1].split('/')[-1].split('.')[0] + "_valid.csv", 'w')
 
     for i in range(validSize):
 
@@ -31,7 +38,7 @@ else:
 
     # create test set
 
-    testFile = open(argv[1] + "_test.txt", 'w')
+    testFile = open(outDir + argv[1].split('/')[-1].split('.')[0]  + "_test.csv", 'w')
 
     for i in range(testSize):
 
@@ -43,7 +50,7 @@ else:
 
     # create training set
 
-    trainFile = open(argv[1] + "_train.txt", 'w')
+    trainFile = open(outDir + argv[1].split('/')[-1].split('.')[0]  + "_train.csv", 'w')
 
     for i in range(trainSize):
 
