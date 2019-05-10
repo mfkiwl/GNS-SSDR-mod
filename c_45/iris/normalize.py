@@ -12,6 +12,8 @@ nFields = len(lines[0].split(',')) -1
 maxima = [-float("inf")] * nFields
 minima = [float("inf")] * nFields
 
+labels = []
+
 def normalize(x, x1, x2):
 
     d = x2 - x1
@@ -32,6 +34,20 @@ for i in range(nLines):
         if value <= minima[j]:
             minima[j] = value;
 
+    if fields[j+1].rstrip() == "Iris-setosa":
+        print(fields[j+1].rstrip() + " == Iris-setosa")
+        labels.append(0)
+
+    elif fields[j+1].rstrip() == "Iris-versicolor":
+        print(fields[j+1].rstrip() + " == Iris-versicolor")
+        labels.append(1)
+
+    elif fields[j+1].rstrip() == "Iris-virginica":
+        print(fields[j+1].rstrip() + " == Iris-virginica")
+        labels.append(2)
+
+
+
 outFile = open(argv[2], 'w')
 
 for i in range(nLines):
@@ -42,7 +58,7 @@ for i in range(nLines):
     for j in range(nFields):   
         s += str(normalize(float(fields[j]), minima[j], maxima[j])) + ','
 
-    s += fields[j+1]
+    s += str(labels[i]) + '\n'
 
     outFile.write(s)
 
