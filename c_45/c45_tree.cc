@@ -27,6 +27,14 @@ void C45_tree::printInfo() {
 }
 
 
+
+
+//////////////////
+//  DATA INPUT  //
+//////////////////
+
+
+
 // THIS IMPLEMENTATION IS SPECIFIC TO TE CSV FORMAT USED BY ALARI
 void C45_tree::readCsv(std::string csvName) {
 
@@ -92,10 +100,179 @@ void C45_tree::sampleToData(std::vector<std::string> &sample) {
 }
 
 
+
+/////////////////////////
+//  TREE CONSTRUCTION  //
+/////////////////////////
+
+
+
 void C45_tree::buildTree(std::string csvName) {
 
     readCsv(csvName);
 }
+
+
+
+
+///////////////////////////
+//  AUXILIARY FUNCTIONS  //
+///////////////////////////
+
+
+double C45_tree::entropy(std::map<long, std::vector<double>> data, int feat) {
+
+    double s = 0;
+
+    for (int cls = 0; cls < nClasses; ++cls) {
+
+        double p = 0; 
+
+        for (int row = 0; row < nSamples; ++row) {
+
+            if (labels[row] == cls) {
+                p += data[row][feat];
+            }
+        }
+
+        p /= nSamples;
+
+        s += p * log2(p);
+    }
+
+    return -s;
+}
+
+
+double C45_tree::gain(  std::map<long, std::vector<double>> top,
+                        std::map<long, std::vector<double>> left,
+                        std::map<long, std::vector<double>> right,
+                        int feature) {
+
+    double eTop = entropy(top, feature);
+    double eLeft = entropy(left, feature) * left.size() / top.size();
+    double eRight = entropy(right, feature) * right.size() / top.size();
+
+    return eTop - eLeft - eRight; 
+}
+
+
+int C45_tree::bestFeature(std::map<long, std::vector<double>> data) {
+
+    int i = 0;
+    double bestEntropy = - DBL_MAX;
+    int bestFeat = -1;
+
+    while (i < nFeatures) {
+
+        float e = entropy(data, i);
+
+        if (e > bestEntropy) {
+
+            bestEntropy = e;
+            bestFeat = i;
+        }
+
+        ++i;
+    }
+
+    return bestFeat;
+}
+
+double C45_tree::bestValue(std::map<long, std::vector<double>> data, int feature) {
+
+    double bestGain = - DBL_MAX;
+    double bestValue = -1;
+    std::map<long, std::vector<double>> bestLeft;
+    std::map<long, std::vector<double>> bestRight;
+
+    std::vector<std::pair<double, long>> sorted = sortByValue(data, feature);
+
+    for (auto it = sorted.begin(); it != sorted.end(); ++it) {
+
+        std::pair < std::map<long, std::vector<double>>, 
+                    std::map<long, std::vector<double>>> subsets = splitData (  
+                                                            data, 
+                                                            feature, 
+                                                            it->first);
+
+        std::map<long, std::vector<double>> dataLeft = subsets.first;
+        std::map<long, std::vector<double>> dataRight = subsets.second;
+
+        double g = gain(data, dataLeft, dataRight, feature);
+
+        if (g >= bestGain) {
+
+            bestGain = g;  
+            bestLeft = dataLeft;
+            bestRight = dataRight;    
+
+            if (it == sorted.begin()) {
+                bestValue = it->first / 2;
+            }
+            else {
+                bestValue = ((it -1)->first + it->first) / 2;
+            }   
+        }
+    }
+
+    return bestValue;
+}
+
+std::vector<std::pair<double, long>> C45_tree::sortByValue(
+                            std::map<long, std::vector<double>> data, int feat) {
+
+    std::vector<std::pair<double, long>> vec;
+
+    for (auto it = data.begin(); it != data.end(); ++it) {
+
+        double value = it->second[feat];
+        long idx = it->first;
+
+        std::pair<double, long> p = std::make_pair(value, idx);
+
+        vec.push_back(p);
+    }
+
+    std::sort(vec.begin(), vec.end());
+
+    return vec;  
+}
+
+std::pair<  std::map<long, std::vector<double>>, 
+            std::map<long, std::vector<double>> > C45_tree::splitData(
+                                    std::map<long, std::vector<double>>
+                                    data, int feat, double threshold) {
+
+    std::pair < std::map<long, std::vector<double>>, 
+                std::map<long, std::vector<double>>> subsets;
+
+    for (auto it = data.begin(); it != data.end(); ++it) {
+
+        long idx = it->first;
+        double val = it->second[feat];
+
+        if (val < threshold) {
+
+            subsets.first[idx] = it->second;
+        }
+        else {
+            subsets.second[idx] = it->second; 
+        }
+    }
+
+    return subsets;
+}
+
+
+
+
+
+
+
+
+
+
 
 
 
