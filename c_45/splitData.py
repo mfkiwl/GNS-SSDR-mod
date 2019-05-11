@@ -11,6 +11,10 @@ else:
     fileObj = open(argv[1])
     lines = fileObj.readlines()
     fileObj.close()
+
+    #skip header
+    lines.pop[0]
+
     random.shuffle(lines)
 
     outDir = argv[2]
