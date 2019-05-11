@@ -35,26 +35,42 @@ private:
 
     // methods
 
+    // data input
+
     void readCsv(std::string csvName);
     void sampleToData(std::vector<std::string> &sample);
 
-    double entropy(std::map<long, std::vector<double>> data, int feat);
 
-    double gain(std::map<long, std::vector<double>> top,
-                std::map<long, std::vector<double>> left,
-                std::map<long, std::vector<double>> right,
+    // tree construction (recusrsively split nodes)
+    void doSplit(C45_node * node);
+
+    // aux
+
+    double entropy(std::map<long, std::vector<double>> &data, int feat);
+
+    double gain(std::map<long, std::vector<double>> &top,
+                std::map<long, std::vector<double>> &left,
+                std::map<long, std::vector<double>> &right,
                 int feature);
 
-    int bestFeature(std::map<long, std::vector<double>> data);
-    double bestValue(std::map<long, std::vector<double>> data, int feature);
+    int bestFeature(std::map<long, std::vector<double>> &data);
+    double bestValue(std::map<long, std::vector<double>> &data, int feature);
     std::vector<std::pair<double, long>> sortByValue(
-                            std::map<long, std::vector<double>> data, int feat);
+                            std::map<long, std::vector<double>> &data, int feat);
 
     std::pair<  std::map<long, std::vector<double>>, 
                 std::map<long, std::vector<double>> > splitData(
-                                    std::map<long, std::vector<double>> data, 
+                                    std::map<long, std::vector<double>> &data, 
                                     int feat, 
                                     double threshold);
+
+    bool allSameClass(std::map<long, std::vector<double>> &data);
+
+    int majority(std::map<long, std::vector<double>> &data);
+
+    void makeLeaf(C45_node * node);
+
+    std::map<long, std::vector<double>> copyData(std::map<long, std::vector<double>> &data);
 };
 
 

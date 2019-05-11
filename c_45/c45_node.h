@@ -19,10 +19,9 @@ private:
     C45_node * parent = nullptr;
     C45_node * left = nullptr;
     C45_node * right = nullptr;
+    int depth = 0;
     int classification = -1;
     std::map<long, std::vector<double>> data;
-    std::map<long, std::vector<double>> dataLeft;
-    std::map<long, std::vector<double>> dataRight;
 
     bool isRoot();
     bool isLeaf();
