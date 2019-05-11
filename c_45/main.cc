@@ -5,7 +5,7 @@
 
 int main(int argc, char * argv[]) {
 
-    C45_tree t1(3, 4, 5, "iris/normalizedIris.data");
+    C45_tree t1(2, 4, 5, "iris/normalizedIris.data");
 
     t1.printInfo();
     
