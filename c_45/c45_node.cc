@@ -18,18 +18,11 @@ bool C45_node::isLeaf() {
 
 std::string C45_node::toString() {
 
-
-    std::string parentId;
     std::string leftId;
     std::string rightId;
     std::string classif;
-
-    if (parent == nullptr) {
-        parentId = "_";
-    }
-    else {
-        rightId = std::to_string(right->id);
-    }
+    std::string splitFeat;
+    std::string splitVal;
 
     if (left == nullptr) {
         leftId = "_";
@@ -52,10 +45,20 @@ std::string C45_node::toString() {
         classif = std::to_string(classification);
     }
 
+    if (isLeaf()) {
+
+        splitFeat = "_";
+        splitVal = "_";
+    }
+    else {
+
+        splitFeat = std::to_string(splitFeature);
+        splitVal = std::to_string(splitValue);
+    }
+
     std::string s = std::to_string(id) + "," +
-                    std::to_string(splitFeature) + "," +
-                    std::to_string(splitValue) + "," +
-                    parentId + "," +
+                    splitFeat + "," +
+                    splitVal + "," +
                     leftId + "," +
                     rightId + "," +
                     classif;

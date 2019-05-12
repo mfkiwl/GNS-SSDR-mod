@@ -13,7 +13,7 @@ public:
 
     C45_tree(int nClasses, int nFeatures, int minSize, int maxDepth);
     void buildTree(std::string csvName);
-//    void saveTree(std::string outName);
+    void saveTree(std::string outName);
     void printInfo();
 
 private:
@@ -53,24 +53,24 @@ private:
                 std::map<long, std::vector<double>> &right,
                 int feature);
 
-    int bestFeature(std::map<long, std::vector<double>> &data);
+
     double bestValue(std::map<long, std::vector<double>> &data, int feature);
+
+    void setParameters(C45_node * node);
+
     std::vector<std::pair<double, long>> sortByValue(
                             std::map<long, std::vector<double>> &data, int feat);
 
     std::pair<  std::map<long, std::vector<double>>, 
                 std::map<long, std::vector<double>> > splitData(
                                     std::map<long, std::vector<double>> &data, 
-                                    int feat, 
-                                    double threshold);
+                                    int feat, double threshold);
 
     bool allSameClass(std::map<long, std::vector<double>> &data);
 
     int majority(std::map<long, std::vector<double>> &data);
 
     void makeLeaf(C45_node * node);
-
-    std::map<long, std::vector<double>> copyData(std::map<long, std::vector<double>> &data);
 };
 
 
