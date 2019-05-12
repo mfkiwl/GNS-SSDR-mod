@@ -121,7 +121,7 @@ void C45_tree::buildTree(std::string csvName) {
 
 void C45_tree::doSplit(C45_node * node) {
 
-    printInfo();
+    std::cout << "splitting node " << node->id << std::endl;
 
     // base cases
 
@@ -138,8 +138,6 @@ void C45_tree::doSplit(C45_node * node) {
 
     int splitFeature = bestFeature(nodeData); 
 
-    std::cout << "calling splitValue" << std::endl; 
- 
     double splitValue = bestValue(nodeData, splitFeature);
 
     std::pair<  std::map<long, std::vector<double>>, 
@@ -200,10 +198,10 @@ double C45_tree::entropy(std::map<long, std::vector<double>> &data, int feat) {
 
         double p = 0; 
 
-        for (int row = 0; row < nSamples; ++row) {
+        for (int row = 0; row < data.size(); ++row) {
 
             if (labels[row] == cls) {
-                p += data[row][feat];
+                p++;
             }
         }
 
@@ -229,7 +227,7 @@ double C45_tree::gain(  std::map<long, std::vector<double>> &top,
     double eLeft = entropy(left, feature) * left.size() / top.size();
     double eRight = entropy(right, feature) * right.size() / top.size();
 
-    return eTop - 0.3; 
+    return eTop - eLeft -eRight; 
 
 }
 
@@ -278,7 +276,7 @@ double C45_tree::bestValue(std::map<long, std::vector<double>> &data, int featur
 
         double g = gain(data, dataLeft, dataRight, feature);
 
-        if (g >= bestGain) {
+        if (g > bestGain) {
 
             bestGain = g;  
             bestLeft = dataLeft;

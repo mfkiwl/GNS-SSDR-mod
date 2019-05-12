@@ -9,7 +9,7 @@ int main(int argc, char * argv[]) {
 
     std::cout << std::endl << "Building tree..." << std::endl << std::endl;
 
-    t1.buildTree("../../data/csvFeaturesFiles/split/cs-ds1-2-3-4-7-balanced/cs-ds1-2-3-4-7-balanced_train.csv");
+    t1.buildTree("../../data/csvFeaturesFiles/split/cs-ds1-2-3-4-7-balanced/cs-ds1-2-3-4-7-balanced_test.csv");
 
     std::cout << std::endl;
     t1.printInfo();
