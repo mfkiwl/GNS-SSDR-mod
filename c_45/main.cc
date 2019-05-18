@@ -1,18 +1,33 @@
 
 #include "c45_tree.h"
+#include "dataSet.h"
 #include <iostream>
 
 
 int main(int argc, char * argv[]) {
 
-    C45_tree t1(2, 16, 5, 20);
+    std::vector<std::string> feats  {
+                                        "min-dop",
+                                        "av-dop",
+                                        "var-dop", // sqrt?
+                                        "min-n.valid-sat",
+                                        "av-valid-sat",
+                                        "var-valid-sat", // sqrt?
+                                        "max-n.valid-sat-changed",
+                                        "var-n.valid-sat-changed", // sqrt?
+                                        "min-snr",
+                                        "max-snr",
+                                        "snr-av",
+                                        "var-snr", // sqrt?
+                                        "min-ps",
+                                        "av-ps", // sqrt?
+                                        "var-ps", // sqrt?
+                                        "max-cp",
+                                    };
 
-    std::cout << std::endl << "Building tree..." << std::endl << std::endl;
+    DataSet ds("csv/cs-ds1-2-3-4-7-balanced_train.csv", feats);
 
-    t1.buildTree("../../data/csvFeaturesFiles/split/cs-ds1-2-3-4-7-balanced/cs-ds1-2-3-4-7-balanced_test.csv");
-    t1.saveTree("test.tree");
-
-    std::cout << std::endl;
+    ds.printRecords();
 
     std::cout << std::endl << "done" << std::endl << std::endl;
 }
