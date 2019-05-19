@@ -142,7 +142,7 @@ which are defined as follows:
 	With $D$ being the the set to split and $D_1$, $D_2$ the candidate subsets,
 	the gain is the difference in of the entropy of $D$ and the weighted
 	sum of the entropies of $D_1$ and $D_2$:
-	$$G(D, D_1, D_2) = H(D) - \frac{H(D_1)}{|D_1|} - \frac{H(D_2)}{|D_2|}$$
+	$$G(D, D_1, D_2) = H(D) - H(D_1)\cdot \frac{|D_1|}{|D|} - H(D_2) \cdot \frac{|D_2|}{|D|}$$
 	
 \end{description}
 

@@ -12,7 +12,11 @@ class C45_tree {
 
 public:
 
-    C45_tree(std::string csvName, int minSize);
+    C45_tree(   std::string csvName, 
+                std::vector<std::string> featureNames, 
+                std::vector<std::string> classes, 
+                int minSize);
+
     void saveTree(std::string outName);
     void printInfo();
 
@@ -22,6 +26,7 @@ private:
 
     C45_node root;
     std::vector<C45_node> nodes;
+    std::vector<std::string> classes;
 
     int minSize;
 
@@ -30,26 +35,11 @@ private:
 
     // aux
 
-    double entropy(std::map<long, std::vector<double>> &data, int feat);
+    double gain(DataSet &top,
+                DataSet &left,
+                DataSet &right);
 
-    double gain(std::map<long, std::vector<double>> &top,
-                std::map<long, std::vector<double>> &left,
-                std::map<long, std::vector<double>> &right,
-                int feature);
-
-
-    double bestValue(std::map<long, std::vector<double>> &data, int feature);
-
-    void setParameters(C45_node * node);
-
-    std::pair<  std::map<long, std::vector<double>>, 
-                std::map<long, std::vector<double>> > splitData(
-                                    std::map<long, std::vector<double>> &data, 
-                                    int feat, double threshold);
-
-    bool allSameClass(std::map<long, std::vector<double>> &data);
-
-    int majority(std::map<long, std::vector<double>> &data);
+    void applyBestSplit(C45_node * node);
 
     void makeLeaf(C45_node * node);
 };

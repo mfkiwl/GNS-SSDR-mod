@@ -212,7 +212,48 @@ void DataSet::printRecords(int nRecords) {
     }
 }
 
+bool DataSet::allSameClass() {
 
+    if (records.size() > 9) {
+
+        std::string currentLabel = records[0].getLabel();
+
+        for (int i = 1; i < records.size(); ++i) {
+
+            if (records[i].getLabel() != currentLabel) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+std::string DataSet::majorityClass() {
+
+    std::map<std::string, long> recordsPerClass;
+
+    for (auto it = records.begin(); it != records.end(); ++it) {
+
+        ++recordsPerClass[it->getLabel()];
+    }
+
+    long maxCount = -1;
+    std::string majority;
+
+    for (auto it = recordsPerClass.begin(); it != recordsPerClass.end(); ++it) {
+
+        long count = it->second;
+
+        if (count > maxCount) {
+
+            maxCount = count;
+            majority = it->first;
+        }
+    }
+
+    return majority;
+}
 
 
 

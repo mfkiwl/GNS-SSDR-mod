@@ -14,9 +14,11 @@ public:
     friend class C45_node;
 
     DataSet();
+
     DataSet(std::string csvName, 
             std::vector<std::string> selectedFeatures,
             std::vector<std::string> classes);
+
     DataSet(std::vector<Record> records, 
             std::vector<std::string> classes);
 
@@ -34,6 +36,8 @@ public:
     void printRecords();
     void printRecords(int nRecords);
 
+    bool allSameClass();
+    std::string majorityClass();
     double entropy();
 
 private:
