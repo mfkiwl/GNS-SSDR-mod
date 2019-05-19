@@ -20,6 +20,8 @@ public:
 
     void printRecord();
 
+    void adjustStandardDeviations();
+
 private:
 
     friend class DatSet;
@@ -29,6 +31,8 @@ private:
     long id;
     std::map< std::string, double > features;
     std::string label;
+
+
 };
 
 

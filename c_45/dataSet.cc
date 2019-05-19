@@ -4,16 +4,43 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <math.h>
 
 DataSet::DataSet() {}
 
-DataSet::DataSet(std::string csvName, std::vector<std::string> selectedFeatures) {
-    readCsv(csvName, selectedFeatures);
+DataSet::DataSet(   std::string csvName, 
+                    std::vector<std::string> selectedFeatures,  
+                    std::vector<std::string> classes) {
+
+    labels = classes,
+    featureNames = selectedFeatures;
+    readCsv(csvName);
+    adjustStandardDeviations();
 }
 
-DataSet::DataSet(std::vector<Record> records) 
-    : records(records)
-{}
+DataSet::DataSet(   std::vector<Record> records, 
+                    std::vector<std::string> classes) 
+    :   records(records), 
+        labels(classes)
+{
+    if (records.size() > 0) { 
+
+        std::map<std::string, double> feats = records[0].getFeatures();
+
+        for (auto it = feats.begin(); it != feats.end(); ++it) {
+
+            featureNames.push_back(it->first);
+        }
+    }
+}
+
+std::vector<std::string> DataSet::getLabels() {
+    return labels;
+}
+std::vector<std::string> DataSet::getFeatureNames() {
+    return featureNames;
+}
+
 
 int DataSet::getSize() {
     return records.size();
@@ -23,7 +50,7 @@ std::vector<Record> DataSet::getRecords() {
     return records;
 }
 
-void DataSet::readCsv(std::string csvName, std::vector<std::string> selectedFeatures) {
+void DataSet::readCsv(std::string csvName) {
 
     std::ifstream csv(csvName);
 
@@ -64,8 +91,8 @@ void DataSet::readCsv(std::string csvName, std::vector<std::string> selectedFeat
             std::string currentFeat = sample[i];
 
             // check if current features is among the selected list
-            if(std::find(selectedFeatures.begin(), 
-                         selectedFeatures.end(), currentHeader) != selectedFeatures.end()) {
+            if(std::find(featureNames.begin(), 
+                         featureNames.end(), currentHeader) != featureNames.end()) {
 
                 features[currentHeader] = std::stod(currentFeat);
             }
@@ -122,11 +149,66 @@ std::vector<Record> DataSet::sortRecordsByFeature(std::string feat) {
     return sorted;
 }
 
+void DataSet::removeFeature(std::string feat) {
+
+    for (auto it = records.begin(); it != records.end(); ++it) {
+
+        it->removeFeature(feat);
+    }
+}
+
+void DataSet::clear() {
+
+    records.clear();
+}
+
+void DataSet::adjustStandardDeviations() {
+
+    for (auto it = records.begin(); it != records.end(); ++it) {
+
+        it->adjustStandardDeviations();
+    }
+}
+
+
+double DataSet::entropy() {
+
+    long nSamples = records.size();
+
+    if (nSamples == 0) {
+        return 0;
+    }
+
+    std::map<std::string, double> labelCounts;
+
+    for (auto it = records.begin(); it != records.end(); ++it) {
+        labelCounts[it->getLabel()] += 1;
+    }  
+
+    double e = 0;
+
+    for (auto it = labelCounts.begin(); it != labelCounts.end(); ++it) {
+
+        double p = it->second / nSamples;
+        e += p * log2(p);
+    } 
+
+    return -e;
+}
+
+
 void DataSet::printRecords() {
 
     for (auto it = records.begin(); it != records.end(); ++it) {
 
         it->printRecord();
+    }
+}
+
+void DataSet::printRecords(int nRecords) {
+
+    for (int i = 0; i < nRecords; ++i) {
+        records[i].printRecord();
     }
 }
 

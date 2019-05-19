@@ -12,8 +12,7 @@
 C45_tree::C45_tree(int nClasses, int nFeatures, int minSize, int maxDepth) 
     :   nClasses(nClasses), 
         nFeatures(nFeatures), 
-        minSize(minSize),
-        maxDepth(maxDepth)
+        minSize(minSize)
 {
 }
 

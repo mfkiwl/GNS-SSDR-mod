@@ -1,6 +1,8 @@
 
 #include "record.h"
 #include <iostream>
+#include <string>
+#include <math.h>
 
 long recordCounter = 0;
 
@@ -32,13 +34,26 @@ std::string Record::getLabel() {
     return label;
 }
 
-void Record::printRecord() {
-
-    std::cout << id;
+void Record::adjustStandardDeviations() {
 
     for (auto it = features.begin(); it != features.end(); ++it) {
 
-        std::cout << "  " << it->second;
+        std::string feature = it->first;
+        double value = it->second;
+
+        if (feature.rfind("var", 0) == 0) {
+            it->second = sqrt(value);
+        }
+    }
+}
+
+void Record::printRecord() {
+
+    std::cout << id << "\t";
+
+    for (auto it = features.begin(); it != features.end(); ++it) {
+
+        std::cout << it->first << "=" << it->second << "\t";
     }
 
     std::cout << std::endl;
