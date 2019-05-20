@@ -140,28 +140,7 @@ void C45_tree::applyBestSplit(C45_node * node) {
 
         std::string feat = *it1;
 
-        for (auto it2 = records.begin(); it2 != records.end(); ++it2) {
-
-            std::map<std::string, double> recFeatures = it2->getFeatures();
-
-            double value = recFeatures[feat];
-
-            std::pair<std::vector<Record>, std::vector<Record>> lr = ds.splitRecords(feat, value);
-
-            DataSet left(lr.first, classes);
-            DataSet right(lr.second, classes);
-
-            double g = gain(ds, left, right);
-
-            if (g > bestGain) {
-
-                bestGain = g;
-                bestFeature = feat;
-                bestValue = value;
-                bestLeft = left;
-                bestRight = right;
-            }
-        }
+        findSplitValue(ds, feat, &bestGain, &bestFeature, &bestValue, &bestLeft, &bestRight);       
     }
 
     std::cout << "split feature: " << bestFeature << std::endl;
@@ -175,6 +154,45 @@ void C45_tree::applyBestSplit(C45_node * node) {
     node->splitFeature = bestFeature;
     node->leftData = bestLeft;
     node->rightData = bestRight;
+}
+
+void C45_tree::findSplitValue(  DataSet &data, 
+                                std::string feature, 
+                                double * bestGain,
+                                std::string * bestFeature,
+                                double * bestValue,
+                                DataSet * bestLeft,
+                                DataSet * bestRight) {
+
+    std::vector<Record> records = data.sortRecordsByFeature(feature);
+
+    for (long i = 0; i < records.size(); ++i) {
+
+        std::map<std::string, double> recFeatures = records[i].getFeatures();
+        double value = recFeatures[feature];
+
+        std::pair<std::vector<Record>, std::vector<Record>> lr = data.splitRecords(feature, value);
+
+        DataSet left(lr.first, classes);
+        DataSet right(lr.second, classes);
+
+        double g = gain(data, left, right);
+
+        if (g > *bestGain) {
+
+            *bestGain = g;
+            *bestFeature = feature;
+            *bestLeft = left;
+            *bestRight = right;
+
+            if (i == 0) {
+                *bestValue = value / 2;
+            }
+            else {
+                *bestValue = (value + records[i-1].getFeatures()[feature]) / 2;
+            }
+        }
+    }
 }
 
 
