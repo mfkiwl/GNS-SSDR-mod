@@ -27,8 +27,7 @@ C45_tree::C45_tree(std::string csvName,
 void C45_tree::printInfo() {
 
     std::cout << "root id: " << root.id << std::endl;
-    std::cout << "n. samples: " << root.data.getSize() << std::endl;
-    std::cout << "n. nodes: " << nodes.size() << std::endl;
+    std::cout << "n. nodes: " << nodes.size() << std::endl << std::endl;
 }
 
 
@@ -43,10 +42,14 @@ void C45_tree::doSplit(C45_node * node) {
 
     // base cases
 
+    if (node == nullptr) {
+        return;
+    }
+
     DataSet data = node->data;
 
-    if (data.getSize() < minSize) {
-        makeLeaf(node->parent);
+    if (data.getSize() <= minSize) {
+        makeLeaf(node);
         return;
     }
 
@@ -59,18 +62,23 @@ void C45_tree::doSplit(C45_node * node) {
     applyBestSplit(node);
 
     if (node->gain == 0) {
-        makeLeaf(node->parent);
+        makeLeaf(node);
         return;
     }
 
     // recursive case
 
-    nodes.push_back(*node);
+    nodes.push_back(node);
 
     doSplit(node->left);
     doSplit(node->right);
+}
 
-    node->data.clear();
+void C45_tree::clearTree() {
+
+    for (int i = 0; i < nodes.size(); ++i) {
+        delete nodes[i];
+    }
 }
 
 ////////////////////
@@ -90,8 +98,8 @@ void C45_tree::saveTree(std::string outName) {
 
     for (int i = 0; i < nodes.size(); ++i) {
 
-        std::cout << "writing node " << nodes[i].id << std::endl;
-        out << nodes[i].toString() << std::endl;
+        std::cout << "writing node " << nodes[i]->id << std::endl;
+        out << nodes[i]->toString() << std::endl;
     } 
 
     out.close();
@@ -129,11 +137,7 @@ void C45_tree::applyBestSplit(C45_node * node) {
 
     DataSet ds = node->data;
 
-    double bestGain = -DBL_MAX;
-    std::string bestFeature;
-    double bestValue;
-    DataSet bestLeft;
-    DataSet bestRight;
+    SplitInfo * splitInfo = new SplitInfo();
 
     std::vector<std::string> features = ds.getFeatureNames();
     std::vector<Record> records = ds.getRecords();
@@ -145,11 +149,7 @@ void C45_tree::applyBestSplit(C45_node * node) {
         threads[i] = std::thread( &C45_tree::findSplitValue, this,
                         std::ref(ds),
                         std::ref(features[i]),
-                        std::ref(bestGain),
-                        std::ref(bestFeature),
-                        std::ref(bestValue),
-                        std::ref(bestLeft),
-                        std::ref(bestRight) );    
+                        splitInfo);    
     }
 
     for (int i = 0; i < features.size(); ++i) {
@@ -157,38 +157,57 @@ void C45_tree::applyBestSplit(C45_node * node) {
         threads[i].join();
     }
 
-    std::cout << "all threads done for node " << node->id << std::endl;
+    node->majority = node->data.majorityClass();
+    node->data.clear();
 
-    std::cout << "split feature: " << bestFeature << std::endl;
-    std::cout << "split value: " << bestValue << std::endl;
+    std::string bestFeature = splitInfo->getFeature();
+    double bestValue = splitInfo->getValue();
+    double bestGain = splitInfo->getGain();
+    DataSet bestLeft = splitInfo->getLeft();
+    DataSet bestRight = splitInfo->getRight();
+
+    delete splitInfo;
 
     bestLeft.removeFeature(bestFeature);
     bestRight.removeFeature(bestFeature);
 
+    std::cout << std::endl << "all threads done for node " << node->id << std::endl;
+
+    std::cout << "split feature: " << bestFeature << std::endl;
+    std::cout << "split value: " << bestValue << std::endl;
+    std::cout << "split gain: " << bestGain << std::endl;
+    std::cout << "left size: " << bestLeft.getSize() << std::endl;
+    std::cout << "right size: " << bestRight.getSize() << std::endl;
+
+
     node->gain = bestGain;
     node->splitFeature = bestFeature;
-    node->leftData = bestLeft;
-    node->rightData = bestRight;
 
-    C45_node left;
-    left.data = bestLeft;
-    left.parent = node;
+    C45_node * left = new C45_node;
+    left->data = bestLeft;
+    left->parent = node;
 
-    C45_node right; 
-    right.data = bestRight;
-    right.parent = node;
+    C45_node * right = new C45_node;
+    right->data = bestRight;
+    right->parent = node;
 
-    node->left = &left;
-    node->right = &right;   
+    if (bestLeft.getSize() > 0) {
+        node->left = left;
+    }
+    else {
+        node->left = nullptr;
+    }
+    if (bestRight.getSize() > 0) {
+        node->right = right;  
+    }
+    else {
+        node->right = nullptr;
+    }
 }
 
 void C45_tree::findSplitValue(  DataSet &data,
                                 std::string &feature, 
-                                double &bestGain,
-                                std::string &bestFeature,
-                                double &bestValue,
-                                DataSet &bestLeft,
-                                DataSet &bestRight) {
+                                SplitInfo * splitInfo) {
 
     std::vector<Record> records = data.sortRecordsByFeature(feature);
 
@@ -204,30 +223,29 @@ void C45_tree::findSplitValue(  DataSet &data,
 
         double g = gain(data, left, right);
 
-        if (g > bestGain) {
-
-            bestGain = g;
-            bestFeature = feature;
-            bestLeft = left;
-            bestRight = right;
-
-            if (i == 0) {
-                bestValue = value / 2;
-            }
-            else {
-                bestValue = (value + records[i-1].getFeatures()[feature]) / 2;
-            }
+        if (i == 0) {
+            value /= 2;
         }
+        else {
+            value = (value + records[i-1].getFeatures()[feature]) / 2;
+        }
+
+        splitInfo->update(g, feature, value, left, right);
     }
 }
 
 
 void C45_tree::makeLeaf(C45_node * node) {
 
+    std::cout << std::endl << "makeLeaf called on node " << node->id << std::endl;
+
     node->left = nullptr;
     node->right = nullptr;
-    node->label = node->data.majorityClass();
+    node->label = node->majority;
+    std::cout << "label set to " << node->label;
     node->data.clear();
+
+    nodes.push_back(node);
 }
 
 

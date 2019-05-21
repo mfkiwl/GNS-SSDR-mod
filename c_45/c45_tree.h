@@ -7,6 +7,63 @@
 #include <vector>
 #include <utility>
 #include <fstream>
+#include <float.h>
+#include <thread>
+#include <mutex>
+
+class SplitInfo {
+
+    public:
+
+    SplitInfo() {
+        bestGain = -DBL_MAX;
+    }
+
+    void update(double gain, std::string feature, double value,
+                DataSet &left, DataSet &right) {
+
+        std::lock_guard<std::mutex> guard(update_mutex);
+
+        if (gain > bestGain) {
+
+            bestGain = gain;
+            bestFeature = feature;
+            bestValue = value;
+            bestLeft = left;
+            bestRight = right;
+        }
+    }
+
+    std::string getFeature() {
+        return bestFeature;
+    }
+
+    double getValue() {
+        return bestValue;
+    }
+
+    double getGain() {
+        return bestGain;
+    }
+
+    DataSet getLeft() {
+        return bestLeft;
+    }
+
+    DataSet getRight() {
+        return bestRight;
+    }
+
+    private:
+
+    std::mutex update_mutex;
+
+    double bestGain;
+    std::string bestFeature;
+    double bestValue;
+    DataSet bestLeft;
+    DataSet bestRight;  
+};
 
 class C45_tree {
 
@@ -18,6 +75,8 @@ public:
                 int minSize);
 
     void saveTree(std::string outName);
+    void clearTree();
+
     void printInfo();
 
 private:
@@ -25,7 +84,7 @@ private:
     // data members
 
     C45_node root;
-    std::vector<C45_node> nodes;
+    std::vector<C45_node *> nodes;
     std::vector<std::string> classes;
 
     int minSize;
@@ -43,13 +102,11 @@ private:
 
     void findSplitValue(DataSet &data,
                         std::string &feture, 
-                        double &bestGain,
-                        std::string &bestFeature,
-                        double &bestValue,
-                        DataSet &bestLeft,
-                        DataSet &bestRight);
+                        SplitInfo * splitInfo);
 
     void makeLeaf(C45_node * node);
+
+
 };
 
 

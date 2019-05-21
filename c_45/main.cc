@@ -30,12 +30,13 @@ int main(int argc, char * argv[]) {
                                     };
 
 
-    C45_tree tree(csvName, feats, classes, 5);
+    C45_tree tree(csvName, feats, classes, 1);
 
 
     std::cout << std::endl;
     tree.printInfo();
     tree.saveTree("out.tree");
+//    tree.clearTree();
 
     std::cout << std::endl << "done" << std::endl << std::endl;
 }

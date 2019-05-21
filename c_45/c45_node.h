@@ -24,8 +24,7 @@ private:
     int depth = 0;
     std::string label = "_";
     DataSet data;
-    DataSet leftData;
-    DataSet rightData;
+    std::string majority;
 
     bool isRoot();
     bool isLeaf();
