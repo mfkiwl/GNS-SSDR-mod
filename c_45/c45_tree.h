@@ -41,13 +41,13 @@ private:
 
     void applyBestSplit(C45_node * node);
 
-    void findSplitValue(DataSet &data, 
-                        std::string feture, 
-                        double * bestGain,
-                        std::string * bestFeature,
-                        double * bestValue,
-                        DataSet * bestLeft,
-                        DataSet * bestRight);
+    void findSplitValue(DataSet &data,
+                        std::string &feture, 
+                        double &bestGain,
+                        std::string &bestFeature,
+                        double &bestValue,
+                        DataSet &bestLeft,
+                        DataSet &bestRight);
 
     void makeLeaf(C45_node * node);
 };

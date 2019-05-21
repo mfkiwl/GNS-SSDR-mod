@@ -6,6 +6,8 @@
 #include <math.h>
 #include <float.h>
 #include <algorithm>
+#include <thread>
+#include <functional>
 
 
 
@@ -136,16 +138,29 @@ void C45_tree::applyBestSplit(C45_node * node) {
     std::vector<std::string> features = ds.getFeatureNames();
     std::vector<Record> records = ds.getRecords();
 
-    for (auto it1 = features.begin(); it1 != features.end(); ++it1) {
+    std::thread threads[features.size()];
 
-        std::string feat = *it1;
+    for (int i = 0; i < features.size(); ++i) {
 
-        findSplitValue(ds, feat, &bestGain, &bestFeature, &bestValue, &bestLeft, &bestRight);       
+        threads[i] = std::thread( &C45_tree::findSplitValue, this,
+                        std::ref(ds),
+                        std::ref(features[i]),
+                        std::ref(bestGain),
+                        std::ref(bestFeature),
+                        std::ref(bestValue),
+                        std::ref(bestLeft),
+                        std::ref(bestRight) );    
     }
+
+    for (int i = 0; i < features.size(); ++i) {
+
+        threads[i].join();
+    }
+
+    std::cout << "all threads done for node " << node->id << std::endl;
 
     std::cout << "split feature: " << bestFeature << std::endl;
     std::cout << "split value: " << bestValue << std::endl;
-     
 
     bestLeft.removeFeature(bestFeature);
     bestRight.removeFeature(bestFeature);
@@ -154,15 +169,26 @@ void C45_tree::applyBestSplit(C45_node * node) {
     node->splitFeature = bestFeature;
     node->leftData = bestLeft;
     node->rightData = bestRight;
+
+    C45_node left;
+    left.data = bestLeft;
+    left.parent = node;
+
+    C45_node right; 
+    right.data = bestRight;
+    right.parent = node;
+
+    node->left = &left;
+    node->right = &right;   
 }
 
-void C45_tree::findSplitValue(  DataSet &data, 
-                                std::string feature, 
-                                double * bestGain,
-                                std::string * bestFeature,
-                                double * bestValue,
-                                DataSet * bestLeft,
-                                DataSet * bestRight) {
+void C45_tree::findSplitValue(  DataSet &data,
+                                std::string &feature, 
+                                double &bestGain,
+                                std::string &bestFeature,
+                                double &bestValue,
+                                DataSet &bestLeft,
+                                DataSet &bestRight) {
 
     std::vector<Record> records = data.sortRecordsByFeature(feature);
 
@@ -178,18 +204,18 @@ void C45_tree::findSplitValue(  DataSet &data,
 
         double g = gain(data, left, right);
 
-        if (g > *bestGain) {
+        if (g > bestGain) {
 
-            *bestGain = g;
-            *bestFeature = feature;
-            *bestLeft = left;
-            *bestRight = right;
+            bestGain = g;
+            bestFeature = feature;
+            bestLeft = left;
+            bestRight = right;
 
             if (i == 0) {
-                *bestValue = value / 2;
+                bestValue = value / 2;
             }
             else {
-                *bestValue = (value + records[i-1].getFeatures()[feature]) / 2;
+                bestValue = (value + records[i-1].getFeatures()[feature]) / 2;
             }
         }
     }
