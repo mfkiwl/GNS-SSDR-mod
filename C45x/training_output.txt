@@ -1,0 +1,122 @@
+Opened csv/cs-ds1-2-3-4-7-balanced_train.csv
+Closed csv/cs-ds1-2-3-4-7-balanced_train.csv
+
+splitting node 0
+running 64 threads
+split feature: var-snr
+split value: 0.502599
+split gain: 0.977578
+left size: 5546
+right size: 5561
+
+splitting node 1
+running 60 threads
+split feature: min-snr
+split value: 38.2247
+split gain: 0.0154286
+left size: 10
+right size: 5536
+
+base case: allSame on  node 3
+
+splitting node 4
+running 56 threads
+split feature: max-snr
+split value: 43.0192
+split gain: 0.00617587
+left size: 5531
+right size: 5
+
+splitting node 5
+running 52 threads
+split feature: max-cp
+split value: -197533
+split gain: 0.00215391
+left size: 635
+right size: 4896
+
+splitting node 7
+running 48 threads
+split feature: min-ps
+split value: 1.50141e+08
+split gain: 0.0230034
+left size: 86
+right size: 549
+
+splitting node 9
+running 44 threads
+split feature: snr-av
+split value: 41.0451
+split gain: 0.320015
+left size: 81
+right size: 5
+
+base case: allSame on  node 11
+
+base case: allSame on  node 12
+
+base case: allSame on  node 10
+
+splitting node 8
+running 48 threads
+split feature: snr-av
+split value: 40.9187
+split gain: 0.00120681
+left size: 82
+right size: 4814
+
+splitting node 13
+running 44 threads
+split feature: av-dop
+split value: 3171.96
+split gain: 0.0950172
+left size: 1
+right size: 81
+
+base case: minSize on  node 15
+
+base case: allSame on  node 16
+
+base case: allSame on  node 14
+
+base case: allSame on  node 6
+
+splitting node 2
+running 60 threads
+split feature: var-dop
+split value: 21.1326
+split gain: 0.0103949
+left size: 5
+right size: 5556
+
+base case: allSame on  node 17
+
+base case: allSame on  node 18
+
+root id: 0
+n. nodes: 19
+
+Opened out.tree
+writing node 0
+writing node 1
+writing node 3
+writing node 4
+writing node 5
+writing node 7
+writing node 9
+writing node 11
+writing node 12
+writing node 10
+writing node 8
+writing node 13
+writing node 15
+writing node 16
+writing node 14
+writing node 6
+writing node 2
+writing node 17
+writing node 18
+Closed out.tree
+
+done
+
