@@ -295,6 +295,7 @@ void C45_tree::makeLeaf(C45_node * node) {
 
     node->left = nullptr;
     node->right = nullptr;
+    node->leaf = true;
     node->data.clear();
 
     nodes.push_back(node);
