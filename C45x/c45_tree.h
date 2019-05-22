@@ -72,7 +72,9 @@ public:
     C45_tree(   std::string csvName, 
                 std::vector<std::string> featureNames, 
                 std::vector<std::string> classes, 
-                int minSize);
+                int minSize,
+                int maxDepth,
+                int threadsPerFeature);
 
     void saveTree(std::string outName);
     void clearTree();
@@ -86,8 +88,11 @@ private:
     C45_node root;
     std::vector<C45_node *> nodes;
     std::vector<std::string> classes;
+    std::vector<std::string> featureNames;
 
     int minSize;
+    int maxDepth;
+    int threadsPerFeature;
 
     // tree construction (recusrsively split nodes)
     void doSplit(C45_node * node);
@@ -102,11 +107,11 @@ private:
 
     void findSplitValue(DataSet &data,
                         std::string &feture, 
-                        SplitInfo * splitInfo);
+                        SplitInfo * splitInfo,
+                        int start,
+                        int stop);
 
     void makeLeaf(C45_node * node);
-
-
 };
 
 

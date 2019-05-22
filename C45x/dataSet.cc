@@ -152,8 +152,13 @@ std::vector<Record> DataSet::sortRecordsByFeature(std::string feat) {
 void DataSet::removeFeature(std::string feat) {
 
     for (auto it = records.begin(); it != records.end(); ++it) {
-
         it->removeFeature(feat);
+    }
+
+    for (int i = 0; i < featureNames.size(); ++i) {
+        if (featureNames[i] == feat) {
+            featureNames.erase(featureNames.begin() + i);
+        }
     }
 }
 

@@ -5,6 +5,7 @@ long nodeCounter = 0;
 
 C45_node::C45_node() {
     id = nodeCounter++;
+    leaf = false;
 }
 
 
@@ -13,7 +14,7 @@ bool C45_node::isRoot() {
 }
 
 bool C45_node::isLeaf() {
-    return left == nullptr && right == nullptr;
+    return leaf;
 }
 
 std::string C45_node::toString() {

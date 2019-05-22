@@ -15,6 +15,7 @@ public:
 private:
 
     long id;
+    bool leaf;
     std::string splitFeature = "_";
     double splitValue = -1;
     double gain = 0;
