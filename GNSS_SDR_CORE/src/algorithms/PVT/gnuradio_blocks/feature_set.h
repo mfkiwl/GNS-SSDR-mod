@@ -26,7 +26,6 @@ public:
 
     // data members
 
-    // In an other class specific classifiers may be instantiated for each channel,
     std::map< int, std::map <std::string, double> > featuresPerChannel;
 
     // methods

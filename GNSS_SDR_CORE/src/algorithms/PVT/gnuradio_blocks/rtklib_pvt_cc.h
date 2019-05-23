@@ -51,10 +51,9 @@
 #include <sys/msg.h>
 #include <sys/types.h>
 #include <utility>
-#include "classification.h"
-#include "dummy_classifier.h"
 
 #include "feature_set.h"
+#include "c45_cl_tree.h"
 
 
 class rtklib_pvt_cc;
@@ -76,7 +75,7 @@ private:
         const rtk_t& rtk);
 
     FeatureSet featureSet;
-    DummyClassifier dummyClassifier;
+    C45_clTree classifier;
 
     void msg_handler_telemetry(pmt::pmt_t msg);
 

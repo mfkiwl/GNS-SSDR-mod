@@ -98,24 +98,25 @@ std::map<std::string, double> FeatureSet::featuresForChannel(int channel_id) {
 
     std::map<std::string, double> features; 
 
+    // names corresponding to the csv files used to train the classifier
     features["channel_id"] = channel_id;
-    features["minDoppler"] = minDoppler;
-    features["stddevDoppler"] = sqrt(varDoppler);
-    features["minValidSats"] = minValidSats;
-    features["minPseudoRange"] = minPseudoranges[channel_id];
-    features["minSigToNoise"] = minSignalToNoise;
-    features["stddevValidsats"] = sqrt(varValidSats);
-    features["stddevSigToNoise"] = sqrt(varSignalToNoise);
-    features["stddevPseudorange"] = sqrt(varPseudoranges[channel_id]);
-    features["maxSatsChanged"] = maxSatsChanged;
-    features["avgValidSats"] = avgValidSatsCurrent;
-    features["avgPseudoRange"] = avgPseudorangesCurrent[channel_id];
-    features["avgDoppler"] = avgDopplerCurrent;
-    features["maxSigToNoise"] = maxSignalToNoise;
-    features["maxCarrierPhase"] = maxCarrierPhases[channel_id];
-    features["maxValidSats"] = maxValidSats;
-    features["avgSigToNoise"] = avgSignalToNoiseCurrent;
-    features["minHeightFromReal"] = minHeightFromReal;
+    features["min-dop"] = minDoppler;
+    features["var-dop"] = sqrt(varDoppler); // stddevs are called var (maybe fix naming?)
+    features["min-n.valid-sat"] = minValidSats;
+    features["min-ps"] = minPseudoranges[channel_id];
+    features["min-snr"] = minSignalToNoise;
+    features["var-valid-sat"] = sqrt(varValidSats);
+    features["var-snr"] = sqrt(varSignalToNoise);
+    features["var-ps"] = sqrt(varPseudoranges[channel_id]);
+    features["max-n.valid-sat-changed"] = maxSatsChanged;
+    features["av-valid-sat"] = avgValidSatsCurrent;
+    features["av-ps"] = avgPseudorangesCurrent[channel_id];
+    features["av-dop"] = avgDopplerCurrent;
+    features["max-snr"] = maxSignalToNoise;
+    features["max-cp"] = maxCarrierPhases[channel_id];
+    features["max-n.valid-sat"] = maxValidSats;
+    features["snr-av"] = avgSignalToNoiseCurrent;
+    features["min-hight"] = minHeightFromReal;
     features["maxAmplitude"] = maxAmplitudes[channel_id];
 
     return features;

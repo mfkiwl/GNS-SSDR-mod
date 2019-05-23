@@ -273,6 +273,8 @@ rtklib_pvt_cc::rtklib_pvt_cc(uint32_t nchannels,
                             gr::io_signature::make(0, 0, 0))
 {
 
+    classifier = C45_clTree("out_8.tree");
+
     d_output_rate_ms = conf_.output_rate_ms;
     d_display_rate_ms = conf_.display_rate_ms;
     d_dump = conf_.dump;
@@ -2893,10 +2895,30 @@ int rtklib_pvt_cc::work(int noutput_items, gr_vector_const_void_star& input_item
                             // exteact features from gnss_observables_map
     
                             featureSet.updateFeaturesPerChannel(gnss_observables_map, d_pvt_solver);
-                            // featureSet.printFeatures();
+                        //    featureSet.printFeatures();
 
-                            Classification cl = dummyClassifier.classify(featureSet);
-                            dummyClassifier.printClass(cl);
+                            std::map< int, std::map <std::string, double> > fpc = featureSet.featuresPerChannel;
+
+                            bool spoofed = false;
+
+                            for (auto it = fpc.begin(); it != fpc.end(); ++it) {
+
+                                //int chId = it->first;
+                                std::map <std::string, double> instance = it->second;
+                                std::string classif = classifier.classify(instance);
+
+                                if (classif == "spoofed") {
+                                    spoofed = true;
+                                    break;
+                                }
+                            }
+
+                            if (spoofed) {
+                                std::cout << "SPOOFED  ";
+                            }   
+                            else {
+                                std::cout << "CLEAN    ";
+                            }  
 
                             /////////////////////////////////////////////////////////////////////////////
 
