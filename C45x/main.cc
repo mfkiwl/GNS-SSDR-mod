@@ -24,19 +24,30 @@ int main(int argc, char * argv[]) {
                                         "snr-av",
                                         "var-snr", // sqrt
                                         "min-ps",
-                                        "av-ps", // sqrt
+                                        "av-ps",
                                         "var-ps", // sqrt
                                         "max-cp",
                                     };
 
+    std::vector<std::string> testFeats  {
+                                        "av-dop",
+                                        "var-dop", // sqrt
+                                        "min-snr",
+                                        "max-snr",
+                                        "snr-av",
+                                        "var-snr", // sqrt
+                                        "min-ps",
+                                        "max-cp",
+                                    };
 
-    C45_tree tree(csvName, feats, classes, 1, 20, 4);
+
+    C45_tree tree(csvName, testFeats, classes, 1, 20, 4);
 
 
     std::cout << std::endl;
     tree.printInfo();
-    tree.saveTree("out.tree");
-//    tree.clearTree();
+    tree.saveTree("out_2.tree");
+    tree.clearTree();
 
     std::cout << std::endl << "done" << std::endl << std::endl;
 }

@@ -12,7 +12,7 @@ int main(int argc, char * argv[]) {
 
     std::string fName = argv[1];
 
-    C45_clTree tree("out.tree");
+    C45_clTree tree(fName);
 
-    std::cout << "OK" << std::endl;
+    tree.printInfo();
 }
