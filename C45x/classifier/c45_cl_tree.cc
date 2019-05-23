@@ -18,7 +18,19 @@ std::string C45_clTree::classify(std::map<std::string, double> &instance) {
 
     std::string label = "no_label";
 
-    return label;
+    C45_clNode node = root;
+
+    while (! node.leaf) {
+
+        if (instance[node.feature] < node.value) {
+            node = nodeMap[node.left];
+        }
+        else {
+            node = nodeMap[node.right];
+        }
+    }
+
+    return node.label;
 }
 
 void C45_clTree::printInfo() {
