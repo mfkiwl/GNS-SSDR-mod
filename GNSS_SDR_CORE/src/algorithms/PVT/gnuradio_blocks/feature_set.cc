@@ -2,8 +2,39 @@
 #include "feature_set.h"
 #include <chrono>
 #include <cmath>
+#include <fstream>
+#include <iostream>
 
 using namespace std::chrono;
+
+FeatureSet::FeatureSet() {
+
+    std::cout << std::endl << "FEATURESET CONSTRUCTOR" << std::endl;
+
+    csvOut.open(outName);
+
+    if (! csvOut.is_open()) {
+        std::cout << "Error opening " << outName << std::endl;
+    }
+
+    std::cout << "Opened " << outName << std::endl;
+
+    writeCsvHeader();
+
+    std::cout << std::endl;
+}
+
+FeatureSet::~FeatureSet() {
+
+    std::cout << std::endl << "FEATURESET DESTRUCTOR" << std::endl;
+
+    if (csvOut.is_open()) {
+        csvOut.close();
+        std::cout << "Closed " << outName << std::endl;;
+    }
+
+    std::cout << std::endl;
+}
 
 void FeatureSet::updateFeaturesPerChannel(  std::map<int, Gnss_Synchro> &synchros, 
                                 std::shared_ptr<rtklib_solver> pvt_solver) {
@@ -332,6 +363,52 @@ void FeatureSet::updateTimeWithNoLock() {
     }
 }
 
+void FeatureSet::writeCsvHeader() {
+
+    // names corresponding to the csv files used to train the classifier
+
+    std::vector<std::string> featureNames {
+                                            "min-dop",
+                                            "var-dop",
+                                            "min-n.valid-sat",
+                                            "min-ps",
+                                            "min-snr",
+                                            "var-valid-sat",
+                                            "var-snr",
+                                            "var-ps",
+                                            "max-n.valid-sat-changed",
+                                            "av-valid-sat",
+                                            "av-ps",
+                                            "av-dop",
+                                            "max-snr",
+                                            "max-cp",
+                                            "max-n.valid-sat",
+                                            "snr-av",
+                                            "min-hight",
+                                            "maxAmplitude"
+                                        };
+
+    std::string header = "";
+
+    for (auto it = featureNames.begin(); it != featureNames.end(); ++it) {
+
+        header += *it + ",";
+    }
+
+    header += "class";
+
+    csvOut << header << std::endl;
+}
+
+void FeatureSet::writeCsvLine(std::map <std::string, double> instance) {
+
+    for (auto it = instance.begin(); it != instance.end(); ++it) {
+
+        csvOut << it->second << ",";
+    }
+
+    csvOut << label << std::endl;
+}
 
 
 

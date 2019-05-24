@@ -2909,8 +2909,9 @@ int rtklib_pvt_cc::work(int noutput_items, gr_vector_const_void_star& input_item
 
                                 if (classif == "spoofed") {
                                     spoofed = true;
-                                    break;
                                 }
+
+                                featureSet.writeCsvLine(instance);
                             }
 
                             if (spoofed) {

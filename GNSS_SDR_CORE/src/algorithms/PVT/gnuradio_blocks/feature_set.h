@@ -24,6 +24,9 @@ class FeatureSet {
 
 public:
 
+    FeatureSet();
+    ~FeatureSet();
+
     // data members
 
     std::map< int, std::map <std::string, double> > featuresPerChannel;
@@ -35,9 +38,16 @@ public:
 
     void printFeatures(); // temporary, to be removed
 
+    void writeCsvHeader();
+    void writeCsvLine(std::map <std::string, double> instance);
+
 private:
 
     long mainCounter = 0;
+
+    std::string outName = "out.csv";
+    std::string label = "clean";
+    std::ofstream csvOut;
 
     // minima, maxima, averages and standard deviations
     // all data as double, for processing by classifiers

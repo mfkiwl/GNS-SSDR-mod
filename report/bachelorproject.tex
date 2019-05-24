@@ -27,8 +27,7 @@
 \end{committee}
 
 \abstract { \emph{Global Navigation Satellite System} (GNSS) receivers are nowadays used in many applications, ranging from
-personal navigation devices to spacecraft navigation and weapon
-guidance. Therefore, reliable GNSS positioning is fundamental and
+personal navigation devices to spacecraft navigation. Therefore, reliable GNSS positioning is fundamental and
 failure to provide accurate positioning could cause catastrophic effects
 threatening vital infrastructures and even causing loss of human lives.
 There may be different reasons for unreliable GNSS signals, among which
@@ -191,6 +190,8 @@ Researchers at the ALaRI institute have prepared csv files containing records fr
 
 
 
+
+
 \section{\textbf{Approach}}
 
 	\subsection{\textbf{General outline}}
@@ -282,7 +283,40 @@ to allow splitting it into disjoint subsets, leaving the training set large enou
 		
 \section{\textbf{Implementation}}
 
-WORK IN PROGRESS
+\subsection{Making the features available at the PVT level of GNSS-SDR.}
+
+\subsubsection{Propagating the raw signal amplitude information from acquisition to PVT}
+
+Though in the end the amplitude of the raw signal is not among the features used by the classifier 
+built in this project, it might be useful in further works when implementing other classifiers.
+
+TODO: describe mods on Gnss\_Synchro.
+
+\subsection{Tree construction}
+
+\subsubsection{Differences with respect to the original C4.5 algorithm}
+
+\subsection{Classifier construction}
+
+\subsubsection{Training and testing on the provided csv files}
+
+\subsection{Integration into GSS-SDR}
+
+\subsubsection{Testing on TEXBAT data}
+
+Running the system on a set of spoofed signals(\texttt{ds7.bin}) classified as expected all traces
+as spoofed. Unexpected was in stead the behavior on a clean data set (\texttt{cleanStatic.bin}):
+all records were wrongly classified as spoofed. There clearly is a mismatch between the provided csv data 
+and the data extracted by the \texttt{FeatureSet} class I wrote. One possibility is that there is a bug in the extraction
+procedure, an other one is that the provide csv data were somehow pre-processed.
+
+A reasonable strategy to investigate this situation is to write an extension to the feature extractor which
+produces csv files containing the data extracted, training classifier on these files and check whether the results are better.
+
+
+
+
+
 
 
 \section{\textbf{Evaluation}}
