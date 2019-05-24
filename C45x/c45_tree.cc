@@ -51,6 +51,11 @@ void C45_tree::doSplit(C45_node * node) {
         return;
     }
 
+    if (node->label == "empty") {
+        makeLeaf(node);
+        return;
+    }
+
     DataSet data = node->data;
 
     if (data.getSize() == 0 || data.getFeatureNames().size() == 0) {
@@ -94,12 +99,6 @@ void C45_tree::doSplit(C45_node * node) {
     doSplit(node->right);
 }
 
-void C45_tree::clearTree() {
-
-    for (int i = 0; i < nodes.size(); ++i) {
-        delete nodes[i];
-    }
-}
 
 ////////////////////
 //  TREE TO FILE  //
@@ -245,13 +244,15 @@ void C45_tree::applyBestSplit(C45_node * node) {
         node->left = left;
     }
     else {
-        node->left = nullptr;
+        left->label = "empty";
+        node->left = left;
     }
     if (bestRight.getSize() > 0) {
         node->right = right;  
     }
     else {
-        node->right = nullptr;
+        right->label = "empty";
+        node->right = right;
     }
 }
 
@@ -296,6 +297,7 @@ void C45_tree::makeLeaf(C45_node * node) {
     node->left = nullptr;
     node->right = nullptr;
     node->leaf = true;
+    node->splitFeature = "_";
     node->data.clear();
 
     nodes.push_back(node);

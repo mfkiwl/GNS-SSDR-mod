@@ -77,7 +77,6 @@ public:
                 int threadsPerFeature);
 
     void saveTree(std::string outName);
-    void clearTree();
 
     void printInfo();
 

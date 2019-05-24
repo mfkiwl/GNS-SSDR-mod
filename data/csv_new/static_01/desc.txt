@@ -1,0 +1,1 @@
+built combining cleanStatic, ds1, ds2 and ds7

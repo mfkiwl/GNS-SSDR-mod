@@ -6,7 +6,7 @@
 
 int main(int argc, char * argv[]) {
 
-    std::string csvName = "csv/cs-ds1-2-3-4-7-balanced_train.csv";
+    std::string csvName = argv[1];
 
     std::vector<std::string> classes {"clean", "spoofed"};
 
@@ -41,13 +41,12 @@ int main(int argc, char * argv[]) {
                                     };
 
 
-    C45_tree tree(csvName, testFeats, classes, 1, 20, 4);
+    C45_tree tree(csvName, feats, classes, 1, 20, 4);
 
 
     std::cout << std::endl;
     tree.printInfo();
     tree.saveTree("out_2.tree");
-    tree.clearTree();
 
     std::cout << std::endl << "done" << std::endl << std::endl;
 }

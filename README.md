@@ -26,3 +26,16 @@ A decision tree construction program based on the c4.5 algorithm
 
 * **report:**
 A LATEX document desccribing the project
+
+* **test:**
+directory where to run the modified GNSS-SDR (assuming it is installed)
+
+## Istallation
+
+from /GNSS-SDR_CORE/build run
+* cmake ..
+* make
+* sudo make install
+
+## Running
+gnss-sdr --config_file=\<fileName\>

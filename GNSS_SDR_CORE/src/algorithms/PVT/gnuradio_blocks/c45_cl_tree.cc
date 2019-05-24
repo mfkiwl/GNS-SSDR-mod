@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <iostream>
+#include <float.h>
 
 C45_clTree::C45_clTree() {}
 
@@ -22,7 +23,16 @@ std::string C45_clTree::classify(std::map<std::string, double> &instance) {
 
     while (! node.leaf) {
 
+        if (nodeMap[node.left].label == "empty") {
+            nodeMap[node.left].value = - DBL_MAX;
+        }
+
+        if (nodeMap[node.right].label == "empty") {
+            nodeMap[node.right].value = - DBL_MAX;
+        }
+
         if (instance[node.feature] < node.value) {
+
             node = nodeMap[node.left];
         }
         else {

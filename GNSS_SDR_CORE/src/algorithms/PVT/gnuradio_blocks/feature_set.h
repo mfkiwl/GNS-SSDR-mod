@@ -46,7 +46,7 @@ private:
     long mainCounter = 0;
 
     std::string outName = "out.csv";
-    std::string label = "clean";
+    std::string label = "spoofed";
     std::ofstream csvOut;
 
     // minima, maxima, averages and standard deviations

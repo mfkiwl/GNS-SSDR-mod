@@ -10,9 +10,11 @@ class C45_node {
 public:
     
     C45_node();
-    friend class C45_tree;
+
 
 private:
+
+    friend class C45_tree;
 
     long id;
     bool leaf;

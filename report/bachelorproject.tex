@@ -178,14 +178,44 @@ Every time an attributeis selected remove it from the attributes on which to tes
 
 \end{description}
 
+\newpage
+
 	\subsection{\textbf{The TEXBAT data set}}
 	
-the \emph{Texas Spoofing Test Battery} TEXBAT is a set of recorded spoofed and non spoofed GNSS traces which is freely
+the \emph{Texas Spoofing Test Battery} TEXBAT is a set of recorded spoofed and non spoofed GNSS traces
+released by the University of Texas at
+Austin, which is freely
 available at \href{http://radionavlab.ae.utexas.edu/datastore/texbat/}{http://radionavlab.ae.utexas.edu/datastore/texbat/}.
-The data used for training, valdating and testing of this project's implementations is taken from parts of TEXBAT.
+It contains two clean sets (\texttt{cleanStatic} and \texttt{cleanDynamic} as well data from several 
+spoofing scenarios) \cite{Garbin}:  \\
 
-Researchers at the ALaRI institute have prepared csv files containing records from TEXBAT labeled as "spoofed" or
-"clean", which is the basis for the supervised learning procedure.
+\begin{tabular}{|c|l|}
+
+\hline
+\textbf{Name} & \textbf{Scenario}  \\ \hline
+
+cleanStatic & clean, static receiver \\ \hline
+
+cleanDynamic & clean, moving receiver \\ \hline
+
+ds1 & Static switch \\ \hline
+
+ds2 & Static overpowered switch \\ \hline
+
+ds3 & Static matched-power time push \\ \hline
+
+ds4 & Static matched-power position push \\ \hline
+
+ds5 & Dynamic overpower time push \\ \hline
+
+ds6 & Dynamic matched-power position push \\ \hline
+
+ds7 & Static matched-power position push \\ \hline
+
+\end{tabular}
+
+
+
 
 
 
