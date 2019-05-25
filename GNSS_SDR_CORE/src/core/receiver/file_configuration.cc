@@ -65,10 +65,12 @@ FileConfiguration::~FileConfiguration()
 
 std::string FileConfiguration::property(std::string property_name, std::string default_value)
 {
+
     if (overrided_->is_present(property_name))
         {
             return overrided_->property(property_name, default_value);
         }
+
     return ini_reader_->Get("GNSS-SDR", property_name, default_value);
 }
 

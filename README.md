@@ -39,3 +39,12 @@ from /GNSS-SDR_CORE/build run
 
 ## Running
 gnss-sdr --config_file=\<fileName\>
+
+gnss-sdr --config_file=\<fileName\> --classifier_tree=\<filename.tree\>
+
+gnss-sdr --config_file=\<fileName\> --csv_output=\<filename.csv\>
+
+gnss-sdr --config_file=\<fileName\> --csv_output=\<filename.csv\> --classification_label=\<label\>
+
+or combinations of the above
+

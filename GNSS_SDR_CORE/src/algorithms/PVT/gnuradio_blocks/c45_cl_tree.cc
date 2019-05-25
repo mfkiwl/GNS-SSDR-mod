@@ -11,8 +11,6 @@ C45_clTree::C45_clTree() {}
 C45_clTree::C45_clTree(std::string fName) {
 
     readTreeFile(fName);
-
-    std::cout << std::endl << "classifier ready" << std::endl << std::endl;
 }
 
 std::string C45_clTree::classify(std::map<std::string, double> &instance) {

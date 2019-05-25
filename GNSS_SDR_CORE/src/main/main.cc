@@ -75,6 +75,7 @@ using google::LogMessage;
 concurrent_queue<Gps_Acq_Assist> global_gps_acq_assist_queue;
 concurrent_map<Gps_Acq_Assist> global_gps_acq_assist_map;
 
+
 int main(int argc, char** argv)
 {
     const std::string intro_help(
@@ -82,6 +83,7 @@ int main(int argc, char** argv)
         "Copyright (C) 2010-2018 (see AUTHORS file for a list of contributors)\n" +
         "This program comes with ABSOLUTELY NO WARRANTY;\n" +
         "See COPYING file to see a copy of the General Public License\n \n");
+
 
     const std::string gnss_sdr_version(GNSS_SDR_VERSION);
     google::SetUsageMessage(intro_help);

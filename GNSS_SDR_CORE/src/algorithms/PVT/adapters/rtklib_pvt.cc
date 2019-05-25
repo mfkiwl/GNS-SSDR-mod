@@ -56,6 +56,7 @@ RtklibPvt::RtklibPvt(ConfigurationInterface* configuration,
                                 in_streams_(in_streams),
                                 out_streams_(out_streams)
 {
+
     Pvt_Conf pvt_output_parameters = Pvt_Conf();
     // dump parameters
     std::string default_dump_filename = "./pvt.dat";

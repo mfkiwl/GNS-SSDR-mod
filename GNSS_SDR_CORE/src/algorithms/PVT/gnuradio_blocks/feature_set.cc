@@ -1,5 +1,6 @@
 
 #include "feature_set.h"
+#include "gnss_sdr_flags.h"
 #include <chrono>
 #include <cmath>
 #include <fstream>
@@ -9,26 +10,38 @@ using namespace std::chrono;
 
 FeatureSet::FeatureSet() {
 
-    std::cout << std::endl << "FEATURESET CONSTRUCTOR" << std::endl;
+    if (FLAGS_csv_output != "-") {
 
-    csvOut.open(outName);
+        csvEnabled = true;
+        outName =  FLAGS_csv_output;
 
-    if (! csvOut.is_open()) {
-        std::cout << "Error opening " << outName << std::endl;
+        if (FLAGS_classification_label != "-") {          
+            label = FLAGS_classification_label;
+        }
+        else {
+            label = "no_class";
+        }
     }
 
-    std::cout << "Opened " << outName << std::endl;
+    if (csvEnabled) {
 
-    writeCsvHeader();
+        csvOut.open(outName);
+
+        if (! csvOut.is_open()) {
+            std::cout << "Error opening " << outName << std::endl;
+        }
+
+        std::cout << "Opened " << outName << std::endl;
+
+        writeCsvHeader();
+    }
 
     std::cout << std::endl;
 }
 
 FeatureSet::~FeatureSet() {
 
-    std::cout << std::endl << "FEATURESET DESTRUCTOR" << std::endl;
-
-    if (csvOut.is_open()) {
+    if (csvEnabled && csvOut.is_open()) {
         csvOut.close();
         std::cout << "Closed " << outName << std::endl;;
     }
@@ -367,50 +380,58 @@ void FeatureSet::writeCsvHeader() {
 
     // names corresponding to the csv files used to train the classifier
 
-    std::vector<std::string> featureNames {
-                                            "min-dop",
-                                            "var-dop",
-                                            "min-n.valid-sat",
-                                            "min-ps",
-                                            "min-snr",
-                                            "var-valid-sat",
-                                            "var-snr",
-                                            "var-ps",
-                                            "max-n.valid-sat-changed",
-                                            "av-valid-sat",
-                                            "av-ps",
-                                            "av-dop",
-                                            "max-snr",
-                                            "max-cp",
-                                            "max-n.valid-sat",
-                                            "snr-av",
-                                            "min-hight",
-                                            "maxAmplitude"
-                                        };
+    if (csvEnabled) {
 
-    std::string header = "";
+        std::vector<std::string> featureNames {
+                                                "min-dop",
+                                                "var-dop",
+                                                "min-n.valid-sat",
+                                                "min-ps",
+                                                "min-snr",
+                                                "var-valid-sat",
+                                                "var-snr",
+                                                "var-ps",
+                                                "max-n.valid-sat-changed",
+                                                "av-valid-sat",
+                                                "av-ps",
+                                                "av-dop",
+                                                "max-snr",
+                                                "max-cp",
+                                                "max-n.valid-sat",
+                                                "snr-av",
+                                                "min-hight",
+                                                "maxAmplitude"
+                                            };
 
-    for (auto it = featureNames.begin(); it != featureNames.end(); ++it) {
+        std::string header = "";
 
-        header += *it + ",";
+        for (auto it = featureNames.begin(); it != featureNames.end(); ++it) {
+
+            header += *it + ",";
+        }
+
+        header += "class";
+
+        csvOut << header << std::endl;
     }
-
-    header += "class";
-
-    csvOut << header << std::endl;
 }
 
 void FeatureSet::writeCsvLine(std::map <std::string, double> instance) {
 
-    for (auto it = instance.begin(); it != instance.end(); ++it) {
+    if (csvEnabled) {
 
-        csvOut << it->second << ",";
+        for (auto it = instance.begin(); it != instance.end(); ++it) {
+
+            csvOut << it->second << ",";
+        }
+
+        csvOut << label << std::endl;
     }
-
-    csvOut << label << std::endl;
 }
 
-
+void FeatureSet::setLabel(std::string l) {
+    label = l;
+}
 
 
 

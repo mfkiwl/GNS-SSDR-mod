@@ -41,12 +41,16 @@ public:
     void writeCsvHeader();
     void writeCsvLine(std::map <std::string, double> instance);
 
+    bool csvEnabled;
+
+    void setLabel(std::string l);
+
 private:
 
     long mainCounter = 0;
 
-    std::string outName = "out.csv";
-    std::string label = "spoofed";
+    std::string outName;
+    std::string label;
     std::ofstream csvOut;
 
     // minima, maxima, averages and standard deviations

@@ -74,6 +74,7 @@ private:
         const Pvt_Conf& conf_,
         const rtk_t& rtk);
 
+    bool classifierEnabled;
     FeatureSet featureSet;
     C45_clTree classifier;
 

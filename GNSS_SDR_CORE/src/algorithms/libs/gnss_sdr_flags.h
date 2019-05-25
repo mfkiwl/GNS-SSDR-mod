@@ -58,5 +58,9 @@ DECLARE_double(pll_bw_hz);        //<! Bandwidth of the PLL low pass filter, in 
 // Declare flags for PVT
 DECLARE_string(RINEX_version);  //<! If defined, specifies the RINEX version (2.11 or 3.02). Overrides the configuration file.
 
+DECLARE_string(classifier_tree);
+DECLARE_string(csv_output);
+DECLARE_string(classification_label);
+
 
 #endif

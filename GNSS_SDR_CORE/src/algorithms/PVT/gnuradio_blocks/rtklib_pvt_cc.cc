@@ -29,6 +29,7 @@
  */
 
 #include "rtklib_pvt_cc.h"
+#include "gnss_sdr_flags.h"
 #include "display.h"
 #include "galileo_almanac.h"
 #include "galileo_almanac_helper.h"
@@ -273,7 +274,17 @@ rtklib_pvt_cc::rtklib_pvt_cc(uint32_t nchannels,
                             gr::io_signature::make(0, 0, 0))
 {
 
-    classifier = C45_clTree("out_8.tree");
+    if (FLAGS_classifier_tree != "-") {
+
+        std::cout << std::endl << "CLASSIFIER: " << FLAGS_classifier_tree << std::endl << std::endl;
+        classifierEnabled = true;
+        classifier = C45_clTree(FLAGS_classifier_tree);
+    }
+    else {
+
+        std::cout << std::endl << "CLASSIFIER: NONE" << std::endl << std::endl;
+        classifierEnabled = false;
+    }
 
     d_output_rate_ms = conf_.output_rate_ms;
     d_display_rate_ms = conf_.display_rate_ms;
@@ -2893,33 +2904,43 @@ int rtklib_pvt_cc::work(int noutput_items, gr_vector_const_void_star& input_item
 
                             /////////////////////////////////////////////////////////////////////////////
                             // exteact features from gnss_observables_map
-    
-                            featureSet.updateFeaturesPerChannel(gnss_observables_map, d_pvt_solver);
-                        //    featureSet.printFeatures();
 
-                            std::map< int, std::map <std::string, double> > fpc = featureSet.featuresPerChannel;
+                            if (classifierEnabled || featureSet.csvEnabled) {
 
-                            bool spoofed = false;
+                                featureSet.updateFeaturesPerChannel(gnss_observables_map, d_pvt_solver);
+                                std::map< int, std::map <std::string, double> > fpc = featureSet.featuresPerChannel;                          
 
-                            for (auto it = fpc.begin(); it != fpc.end(); ++it) {
+                                bool spoofed = false;
 
-                                //int chId = it->first;
-                                std::map <std::string, double> instance = it->second;
-                                std::string classif = classifier.classify(instance);
+                                for (auto it = fpc.begin(); it != fpc.end(); ++it) {
 
-                                if (classif == "spoofed") {
-                                    spoofed = true;
+                                    std::map <std::string, double> instance = it->second;
+
+                                    if (classifierEnabled) {
+
+                                        std::string classif = classifier.classify(instance);
+                                        featureSet.setLabel(classif);
+
+                                        if (classif == "spoofed") {
+                                            spoofed = true;
+                                        }
+                                    }
+
+                                    if (featureSet.csvEnabled) {
+                                        featureSet.writeCsvLine(instance);
+                                    }
+
                                 }
 
-                                featureSet.writeCsvLine(instance);
+                                if (classifierEnabled && spoofed) {
+                                    std::cout << "SPOOFED  ";
+                                }   
+                                else if (classifierEnabled && ! spoofed) {
+                                    std::cout << "CLEAN    ";
+                                } 
                             }
 
-                            if (spoofed) {
-                                std::cout << "SPOOFED  ";
-                            }   
-                            else {
-                                std::cout << "CLEAN    ";
-                            }  
+                            
 
                             /////////////////////////////////////////////////////////////////////////////
 

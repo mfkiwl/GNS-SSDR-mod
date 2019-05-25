@@ -64,6 +64,9 @@ DEFINE_double(dll_bw_hz, 0.0, "If defined, bandwidth of the DLL low pass filter,
 
 DEFINE_double(pll_bw_hz, 0.0, "If defined, bandwidth of the PLL low pass filter, in Hz (overrides the configuration file).");
 
+DEFINE_string(classifier_tree, "-", "if defined, path to classifier .tree file");
+DEFINE_string(csv_output, "-", "if defined, path to csv output");
+DEFINE_string(classification_label, "-", "if defined, sets label for csv output");
 
 #if GFLAGS_GREATER_2_0
 
