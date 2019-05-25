@@ -46,7 +46,7 @@ private:
     std::vector<std::string> featureNames;
     std::vector<Record> records;
 
-    void adjustStandardDeviations();
+//    void adjustStandardDeviations();
 };
 
 

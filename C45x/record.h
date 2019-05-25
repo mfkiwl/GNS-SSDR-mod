@@ -20,7 +20,7 @@ public:
 
     void printRecord();
 
-    void adjustStandardDeviations();
+//    void adjustStandardDeviations();
 
 private:
 

@@ -34,6 +34,7 @@ std::string Record::getLabel() {
     return label;
 }
 
+/*
 void Record::adjustStandardDeviations() {
 
     for (auto it = features.begin(); it != features.end(); ++it) {
@@ -46,6 +47,7 @@ void Record::adjustStandardDeviations() {
         }
     }
 }
+*/
 
 void Record::printRecord() {
 

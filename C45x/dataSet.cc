@@ -15,7 +15,7 @@ DataSet::DataSet(   std::string csvName,
     labels = classes,
     featureNames = selectedFeatures;
     readCsv(csvName);
-    adjustStandardDeviations();
+//    adjustStandardDeviations();
 }
 
 DataSet::DataSet(   std::vector<Record> records, 
@@ -167,6 +167,7 @@ void DataSet::clear() {
     records.clear();
 }
 
+/*
 void DataSet::adjustStandardDeviations() {
 
     for (auto it = records.begin(); it != records.end(); ++it) {
@@ -174,7 +175,7 @@ void DataSet::adjustStandardDeviations() {
         it->adjustStandardDeviations();
     }
 }
-
+*/
 
 double DataSet::entropy() {
 
